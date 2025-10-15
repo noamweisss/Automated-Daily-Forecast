@@ -1,0 +1,362 @@
+# IMS Weather Story Automation Project
+
+## Comprehensive Project Documentation
+
+**Last Updated:** October 15, 2025
+**Project Status:** Phase 1 - XML Parsing & Data Extraction (Refinements In Progress)
+
+---
+
+## 🎯 Project Overview
+
+### Goal
+
+Build an automated Python script that:
+
+1. Downloads daily weather forecast XML from Israel Meteorological Service (IMS)
+2. Parses the forecast data for 15 Israeli cities
+3. Generates a designed Instagram story image (1080x1920px)
+4. Emails the image to the social media manager
+5. Runs automatically every morning at 6:00 AM
+
+### Background
+
+- **Team:** IMS Social Media & Design Team
+- **User Role:** Designer with basic technical skills, learning Python
+- **End Goal:** Deploy on IMS servers after approval from CEO
+- **Approach:** Build incrementally, one phase at a time
+
+---
+
+## 📋 Project Phases
+
+### Phase 1: XML Parsing & Data Extraction 🔄 REFINEMENTS IN PROGRESS
+
+**Goal:** Successfully extract forecast data from XML file with robust automation
+
+**Core Tasks:**
+
+- [x] Install Python 3.13.2
+- [x] Set up VS Code
+- [x] Convert XML file to UTF-8 encoding
+- [x] Verify Hebrew text displays correctly
+- [x] Parse XML structure correctly
+- [x] Extract city data (name, coordinates, temperatures, weather code)
+- [x] Filter for specific date
+- [x] Sort cities by latitude (north to south)
+
+**Refinement Tasks (Current Focus):**
+
+- [x] Create test extraction scripts (minimal & full)
+- [x] Prove basic extraction works
+- [ ] Build automatic XML download from IMS website
+- [ ] Implement encoding conversion (ISO-8859-8 → UTF-8)
+- [ ] Add archive management (keep 14 days of historical XML)
+- [ ] Enhance extraction with error handling
+- [ ] Create main workflow orchestration script
+- [ ] Add comprehensive logging system
+- [ ] Implement dry-run mode for testing
+- [ ] Dynamic date handling (use today's date)
+- [ ] Fallback to archived data if download fails
+- [ ] Validate city count (expect exactly 15, warn if different)
+
+**Major Breakthrough:** ✅ Successfully created working extraction scripts that extract all 15 cities and sort them north to south!
+
+**Current Focus:** Building production-ready automation with download, archiving, error handling, and logging
+
+### Phase 2: Single City Image Generation ⏳ NOT STARTED
+
+**Goal:** Create proof-of-concept image with one city
+
+**Tasks:**
+
+- Set up Pillow library
+- Load Google Font (Hebrew support)
+- Create basic image canvas
+- Render one city with: emoji icon, temperature, Hebrew name
+- Handle RTL (right-to-left) text correctly
+- Export as JPG
+
+### Phase 3: Complete Design Implementation ⏳ NOT STARTED
+
+**Goal:** Generate full 15-city forecast image
+
+**Design Specifications:**
+
+- Canvas: 1080x1920px (Instagram story size)
+- Background: Gradient (blue → orange)
+- Layout: 15 cities vertically, sorted north to south
+- Each row: Semi-transparent rectangle, weather emoji, temperature range, Hebrew city name
+- Font: Google Fonts with Hebrew support
+
+### Phase 4: Scheduling & Email Delivery ⏳ NOT STARTED
+
+- Daily scheduling (Windows Task Scheduler)
+- 6:00 AM execution
+- Email functionality
+- Error handling and logging
+
+### Phase 5: Server Compatibility ⏳ FUTURE
+
+- Test on IMS servers
+- Linux compatibility if needed
+- Deployment documentation
+
+---
+
+## 📁 File Structure
+
+```XML
+C:\Users\noamw\Desktop\ims\Automated Daily Forecast\
+├── isr_cities_utf8.xml              # Main XML data file (UTF-8 encoded)
+├── ims_project_docs.md              # This file - comprehensive project documentation
+├── PROJECT_STRUCTURE.md             # Detailed file structure and script purposes
+├── Claude session.md                # Previous conversation log
+│
+├── archive/                         # Historical XML files (14-day retention)
+│   └── README.md                    # Archive folder documentation
+│
+├── logs/                            # Application logs
+│   └── README.md                    # Logs folder documentation
+│
+├── output/                          # Generated weather story images
+│   └── README.md                    # Output folder documentation
+│
+├── exploration/                     # Development & test scripts
+│   ├── README.md                    # Exploration scripts documentation
+│   ├── test_extraction_minimal.py   # ✅ Minimal extraction test (1 city)
+│   ├── extract_all_cities.py        # ✅ Full extraction test (15 cities)
+│   ├── inspect_xml.py               # ✅ XML structure inspector
+│   ├── test_date.py                 # ✅ Date formatting tests
+│   ├── find_todays_forecast.py      # ✅ Available dates lister
+│   └── parse_weather.py             # ⚠️ Unicode error - for reference
+│
+└── [future production scripts]      # To be created in root directory
+    ├── download_forecast.py         # Download & encode XML from IMS
+    ├── extract_forecast.py          # Production extraction with error handling
+    ├── forecast_workflow.py         # Main orchestration script
+    └── utils.py                     # Shared utility functions
+```
+
+---
+
+## 🗺️ Data Structure Reference
+
+### XML Structure
+
+```xml
+<IsraelCitiesWeatherForecastMorning>
+    <Identification>
+        <IssueDateTime>2025-09-28 04:46</IssueDateTime>
+    </Identification>
+    <Location>
+        <LocationMetaData>
+            <LocationId>520</LocationId>
+            <LocationNameEng>Elat</LocationNameEng>
+            <LocationNameHeb>אילת</LocationNameHeb>
+            <DisplayLat>29.55</DisplayLat>
+            <DisplayLon>34.9</DisplayLon>
+        </LocationMetaData>
+        <LocationData>
+            <TimeUnitData>
+                <Date>2025-09-28</Date>
+                <Element>
+                    <ElementName>Maximum temperature</ElementName>
+                    <ElementValue>39</ElementValue>
+                </Element>
+                <Element>
+                    <ElementName>Minimum temperature</ElementName>
+                    <ElementValue>26</ElementValue>
+                </Element>
+                <Element>
+                    <ElementName>Weather code</ElementName>
+                    <ElementValue>1580</ElementValue>
+                </Element>
+                <!-- More elements... -->
+            </TimeUnitData>
+            <!-- 3 more TimeUnitData blocks for following days -->
+        </LocationData>
+    </Location>
+    <!-- 14 more Location blocks -->
+</IsraelCitiesWeatherForecastMorning>
+```
+
+**Key Points:**
+
+- Each `<Location>` represents one city
+- Each city has 4 `<TimeUnitData>` blocks (4-day forecast)
+- Each `<TimeUnitData>` has a `<Date>` element
+- Weather data is stored in `<Element>` tags with `<ElementName>` and `<ElementValue>`
+
+### Cities Data
+
+**15 Cities (Alphabetical in XML):**
+Elat, Ashdod, Beer Sheva, Bet Shean, Haifa, Tiberias, Jerusalem, Lod, Mizpe Ramon, Nazareth, En Gedi, Afula, Zefat, Qazrin, Tel Aviv-Yafo
+
+**Required Sort Order (North to South by Latitude):**
+
+1. Qazrin (33.0°N)
+2. Zefat (33.05°N)
+3. Bet Shean (32.45°N)
+4. Tiberias (32.8°N)
+5. Haifa (32.82°N)
+6. Nazareth (32.75°N)
+7. Afula (32.52°N)
+8. Tel Aviv-Yafo (32.1°N)
+9. Lod (31.85°N)
+10. Ashdod (31.84°N)
+11. Jerusalem (31.78°N)
+12. En Gedi (31.42°N)
+13. Beer Sheva (31.25°N)
+14. Mizpe Ramon (30.61°N)
+15. Elat (29.55°N)
+
+### Weather Codes
+
+Weather codes are numeric values that need to be mapped to emoji icons. Examples:
+
+- 1250: Clear/Sunny
+- 1220: Partly Cloudy
+- 1310: Mostly Clear
+- 1580: Very Hot/Sunny
+
+**Note:** Full weather code mapping needs to be researched from IMS documentation.
+
+---
+
+## 🔧 Technical Decisions Made
+
+### Language & Libraries
+
+- **Python 3.13.2:** Main programming language
+- **xml.etree.ElementTree:** XML parsing (Python standard library)
+- **Pillow (PIL):** Future image generation
+- **datetime:** Date handling
+
+### Encoding
+
+- **Issue:** Original XML had encoding problems with Hebrew text
+- **Solution:** Converted to UTF-8 encoding
+- **File:** `isr_cities_utf8.xml` is the working version
+
+### Design Approach
+
+- Build incrementally, test each component
+- Start with console output before moving to image generation
+- Focus on getting Phase 1 working completely before moving forward
+
+---
+
+## 🐛 Known Issues & Considerations
+
+### ✅ Resolved Issues
+
+#### Issue #1: Zero Cities Extracted - RESOLVED
+
+- **Original Problem:** Script reported finding 15 cities but extracted 0 cities' worth of data
+- **Solution:** Created minimal test scripts that successfully extract data from all 15 cities
+- **Current Status:** Extraction working perfectly with both test scripts
+
+### ⚠️ Outstanding Items
+
+### Item #1: Weather Code Mapping
+
+- **Status:** Partial understanding
+- **Known Codes:**
+  - `1250` - Clear/Sunny
+  - `1220` - Partly Cloudy
+  - `1310` - Mostly Clear
+  - `1580` - Very Hot/Sunny
+- **Next Steps:** Research complete IMS weather code documentation or reverse-engineer from historical data
+
+#### Item #2: Production Script Error Handling
+
+- **Status:** Not yet implemented
+- **Needed:** Robust error handling for download failures, network issues, malformed XML, missing data
+- **Priority:** High - needed before automation
+
+---
+
+## 💡 Learning Points & Progress
+
+### Skills Developed
+
+- Basic XML parsing with ElementTree
+- File path handling in Windows
+- Text encoding (UTF-8)
+- Hebrew text handling
+- Python project structure
+
+### Successful Milestones
+
+✅ Python environment set up correctly  
+✅ UTF-8 encoding issue resolved  
+✅ Hebrew text displays correctly  
+✅ XML file structure understood  
+✅ City sorting logic planned  
+
+### Challenges Encountered
+
+- XML parsing complexity higher than expected
+- Need to debug extraction logic methodically
+- Hebrew text encoding required special attention
+
+---
+
+## 📝 Notes for Future Development
+
+### When Moving to Phase 2
+
+- Research Google Fonts with Hebrew support (Rubik, Heebo, Alef are good options)
+- Test RTL text rendering in Pillow
+- Consider using PIL.ImageDraw for text placement
+
+### For Email Functionality (Phase 4)
+
+- Use `smtplib` for sending emails
+- Store credentials securely (environment variables)
+- Add error notifications if script fails
+
+### For Server Deployment (Phase 5)
+
+- Test on Linux environment
+- Document all dependencies in requirements.txt
+- Create deployment guide for IT team
+
+---
+
+## 🎓 Resources & References
+
+- **Python XML Parsing:** [ElementTree Documentation](https://docs.python.org/3/library/xml.etree.elementtree.html)
+- **Pillow Library:** [Pillow Docs](https://pillow.readthedocs.io/)
+- **Hebrew Fonts:** Google Fonts with Hebrew support
+- **Instagram Story Size:** 1080x1920px (9:16 aspect ratio)
+
+---
+
+## 🤝 Project Team & Workflow
+
+**Developer:** Noam (IMS Design Team)  
+**Manager:** Social Media Team Manager  
+**Approval Required From:** IMS CEO (for server deployment)
+
+**Development Approach:**
+
+- Incremental development with testing at each stage
+- No hard deadlines - focus on learning and quality
+- Regular testing and validation
+- Clear documentation for future handoff
+
+---
+
+## 📧 Contact & Support
+
+For questions or issues with this project, consult:
+
+1. Claude AI assistant for coding help
+2. Python documentation for technical references
+3. IMS IT team for server deployment questions
+
+---
+
+## End of Documentation

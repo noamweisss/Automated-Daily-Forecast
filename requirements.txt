@@ -1,0 +1,32 @@
+# IMS Weather Forecast Automation - Python Dependencies
+# Install all dependencies: pip install -r requirements.txt
+
+# ============================================================================
+# Phase 1: XML Download & Extraction
+# ============================================================================
+
+# HTTP requests for downloading XML from IMS website
+requests>=2.31.0
+
+# ============================================================================
+# Phase 2: Image Generation (Future)
+# ============================================================================
+
+# Image processing library (uncomment when needed)
+# Pillow>=10.0.0
+
+# ============================================================================
+# Phase 4: Email Delivery (Future)
+# ============================================================================
+
+# Email functionality is built-in with smtplib (no external dependency needed)
+
+# ============================================================================
+# Development Dependencies (Optional)
+# ============================================================================
+
+# Code formatting (optional)
+# black>=23.0.0
+
+# Linting (optional)
+# pylint>=3.0.0
