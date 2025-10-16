@@ -9,11 +9,14 @@
 requests>=2.31.0
 
 # ============================================================================
-# Phase 2: Image Generation (Future)
+# Phase 2: Image Generation
 # ============================================================================
 
-# Image processing library (uncomment when needed)
-# Pillow>=10.0.0
+# Image processing library for generating forecast images
+Pillow>=10.0.0
+
+# Hebrew RTL (right-to-left) text support for Pillow
+python-bidi>=0.4.2
 
 # ============================================================================
 # Phase 4: Email Delivery (Future)
