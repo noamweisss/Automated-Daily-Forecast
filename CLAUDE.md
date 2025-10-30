@@ -186,13 +186,15 @@ pip install -r requirements.txt
 ### Hebrew Text Handling
 
 **Encoding:** All XML files MUST be UTF-8. Original IMS XML is ISO-8859-8.
+ 
+**RTL Rendering (Automatic Detection):**
+The script now automatically handles Hebrew RTL rendering across different environments.
 
-**RTL Rendering:**
-```python
-from bidi.algorithm import get_display
-# Convert Hebrew text for proper RTL display
-display_text = get_display(hebrew_text)
-```
+1.  **Raqm Support Detection:** It uses `PIL.features.check('raqm')` to determine if Pillow has been installed with complex text layout support.
+2.  **Modern Path (Raqm available):** If `True`, the script passes the original Hebrew string to `draw.text()` with the `direction='rtl'` argument, letting Pillow's advanced engine handle everything.
+3.  **Fallback Path (Raqm unavailable):** If `False`, it pre-shapes the text using `bidi.algorithm.get_display()` before passing it to `draw.text()` (without the `direction` argument).
+
+This ensures the text displays correctly whether running in a basic environment or a fully-featured one, without manual code changes.
 
 **Font Requirements:** Use fonts with Hebrew Unicode support (e.g., Open Sans Variable)
 
@@ -330,8 +332,6 @@ logger.error("Critical failure")
 1. **Encoding issues:** Always ensure XML is UTF-8 before parsing. Don't try to parse ISO-8859-8 directly.
 
 2. **Date format:** XML uses YYYY-MM-DD format. Always match this format when filtering forecasts.
-
-3. **Hebrew text rendering:** Must use python-bidi `get_display()` for proper RTL rendering. Direct rendering will show reversed/disconnected characters.
 
 4. **Variable font axes:** Must call `set_variation_by_axes([width, weight])` AFTER creating font object, BEFORE using it. Note the order is [width, weight] for Open Sans.
 
