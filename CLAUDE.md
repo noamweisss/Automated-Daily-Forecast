@@ -240,13 +240,68 @@ Open Sans uses two axes:
 1. **Weight axis** (wght): 300 (Light) → 800 (ExtraBold)
 2. **Width axis** (wdth): 75 (Condensed) → 100 (Normal)
 
-To set axes:
+**Correct API Usage:**
 ```python
 font = ImageFont.truetype(str(FONT_VARIABLE), size)
 font.set_variation_by_axes([width, weight])  # e.g., [100, 600] - ORDER MATTERS!
 ```
 
-**IMPORTANT:** The axes order is `[width, weight]` for Open Sans, determined by the font's fvar table.
+**IMPORTANT:** The axes order is `[width, weight]` for Open Sans, determined by the font's fvar table. **This order varies by font!**
+
+**Common Mistakes - Do NOT Use These:**
+```python
+# ❌ WRONG: Dictionary syntax not supported
+font.set_variation_by_name({'wght': weight, 'wdth': width})
+
+# ❌ WRONG: Wrong number of arguments
+font.set_variation_by_name('wght', weight)
+
+# ❌ WRONG: String format not supported
+font.set_variation_by_name(f"wght={weight},wdth={width}")
+
+# ❌ WRONG: Incorrect axis order for Open Sans
+font.set_variation_by_axes([weight, width])  # Width comes first!
+```
+
+**When in Doubt - Check PIL Documentation:**
+```python
+from PIL import ImageFont
+help(ImageFont.FreeTypeFont.set_variation_by_axes)
+# Output: set_variation_by_axes(self, axes: list[float]) -> None
+```
+
+**Best Practice:** Always check API documentation BEFORE trial-and-error attempts. Save 20-30 minutes of troubleshooting.
+
+### Font Acquisition Best Practices
+
+**IMPORTANT:** Always validate downloaded font files before using them in code.
+
+**Correct URLs for Open Sans (Google Fonts GitHub):**
+- Variable font: `https://github.com/google/fonts/raw/main/ofl/opensans/OpenSans%5Bwdth%2Cwght%5D.ttf`
+- Static fonts: `https://github.com/google/fonts/raw/main/ofl/opensans/static/OpenSans-*.ttf`
+
+**Critical Path Note:** The path is `/ofl/opensans/` NOT `/apache/opensans/` or `/apache/opensans/static/`
+
+**File Validation Immediately After Download:**
+```bash
+# Should output "TrueType Font data", NOT "HTML document"
+file path/to/font.ttf
+
+# Check file size (font files typically 100KB-1MB)
+ls -lh path/to/font.ttf
+```
+
+**Common Pitfall:** GitHub URLs without "raw" in the path will download HTML error pages instead of actual font files. Always verify the file is binary data, not HTML.
+
+**Test Font Loading:**
+```python
+from PIL import ImageFont
+try:
+    font = ImageFont.truetype("path/to/font.ttf", 20)
+    print("✓ Font loaded successfully")
+except Exception as e:
+    print(f"✗ Font load failed: {e}")
+```
 
 ### Weather Icon System
 
@@ -299,6 +354,78 @@ logger.warning("Recoverable issue")
 logger.error("Critical failure")
 ```
 
+### File Validation Checklist
+
+**Pre-Flight Checklist for All External Resources**
+
+Before using any downloaded file (fonts, icons, data files), follow these validation steps:
+
+**1. Verify File Type:**
+```bash
+file path/to/downloaded/file
+# Expected: Specific file type (e.g., "TrueType Font data", "PNG image data")
+# Warning: If you see "HTML document" or "ASCII text", the download failed
+```
+
+**2. Check File Size:**
+```bash
+ls -lh path/to/file
+# Font files: typically 100KB-1MB
+# Icon PNGs: typically 5KB-50KB
+# XML data: varies by content
+```
+
+**3. Test Loading (for fonts):**
+```python
+from PIL import ImageFont
+try:
+    font = ImageFont.truetype("path/to/font.ttf", 20)
+    print("✓ Font validation passed")
+except Exception as e:
+    print(f"✗ Font validation failed: {e}")
+    # Do NOT proceed - fix the download issue first
+```
+
+**4. Never Assume Download Succeeded:**
+- GitHub URLs can redirect to error pages (HTML instead of binary)
+- Network issues can produce partial/corrupted files
+- Validate immediately after download, not later during image generation
+
+**Time Saved:** This checklist prevents 50+ lines of debugging corrupt/invalid files.
+
+### Working Directory Management
+
+**Best Practice:** Use absolute paths to avoid directory confusion.
+
+**Good - Using pathlib with absolute paths:**
+```python
+from pathlib import Path
+
+BASE_DIR = Path(__file__).parent.absolute()
+FONT_PATH = BASE_DIR / "fonts" / "OpenSans-Variable.ttf"
+OUTPUT_DIR = BASE_DIR / "output"
+```
+
+**Bad - Using relative paths:**
+```python
+FONT_PATH = "fonts/OpenSans-Variable.ttf"  # Breaks if cwd changes
+OUTPUT_DIR = "output"  # Fragile and error-prone
+```
+
+**In Bash Commands:**
+```bash
+# Good: Explicit directory change with command chaining
+cd /workspaces/Automated-Daily-Forecast && python generate_forecast_image.py
+
+# Also Good: Absolute paths
+python /workspaces/Automated-Daily-Forecast/generate_forecast_image.py
+
+# Bad: Assuming current directory
+python generate_forecast_image.py  # May fail if cwd is wrong
+```
+
+**Important Note:** Claude Code may reset the working directory between bash commands. Always use absolute paths or explicit `cd` commands.
+
 ## Data Specifications
 
 ### 15 Israeli Cities (North to South)
@@ -333,13 +460,29 @@ logger.error("Critical failure")
 
 3. **Hebrew text rendering:** Must use python-bidi `get_display()` for proper RTL rendering. Direct rendering will show reversed/disconnected characters.
 
-4. **Variable font axes:** Must call `set_variation_by_axes([width, weight])` AFTER creating font object, BEFORE using it. Note the order is [width, weight] for Open Sans.
+4. **Variable font axes:**
+   - Must call `set_variation_by_axes([width, weight])` AFTER creating font object, BEFORE using it
+   - **CRITICAL:** Axis order is `[width, weight]` for Open Sans - varies by font!
+   - **Check documentation first:** Use `help(ImageFont.FreeTypeFont.set_variation_by_axes)` before trial-and-error
+   - Avoid guessing API syntax - saves 20-30 minutes
 
-5. **Dry-run mode:** When testing, always use `--dry-run` flag first to avoid modifying files accidentally.
+5. **Font file downloads:**
+   - Always use GitHub "raw" URLs (e.g., `github.com/user/repo/raw/main/path/file.ttf`)
+   - Validate file type immediately with `file` command after download
+   - If you see "HTML document" instead of "TrueType Font data", the URL is wrong
+   - Common issue: Missing "raw" in URL or incorrect repository path
+   - **Prevents 50+ lines of troubleshooting**
 
-6. **City name variations:** XML uses "Tel Aviv - Yafo" (with space-dash-space), not "Tel Aviv-Yafo". Check exact spelling when filtering cities.
+6. **Dry-run mode:** When testing, always use `--dry-run` flag first to avoid modifying files accidentally.
 
-7. **Archive fallback:** Don't assume main XML file always exists. Extraction has built-in fallback to latest archive.
+7. **City name variations:** XML uses "Tel Aviv - Yafo" (with space-dash-space), not "Tel Aviv-Yafo". Check exact spelling when filtering cities.
+
+8. **Archive fallback:** Don't assume main XML file always exists. Extraction has built-in fallback to latest archive.
+
+9. **Working directory confusion:**
+   - Use absolute paths in Python scripts (`Path(__file__).parent.absolute()`)
+   - Claude Code may reset working directory between bash commands
+   - In bash: Use `cd /full/path && command` or absolute paths
 
 ## Future Phases
 
