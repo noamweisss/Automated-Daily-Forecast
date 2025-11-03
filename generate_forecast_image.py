@@ -77,12 +77,53 @@ FONT_VARIABLE = FONT_DIR / "OpenSans-Variable.ttf"
 LOGO_PATH = ASSETS_DIR / "logos" / "IMS_logo.png"
 WEATHER_ICONS_DIR = ASSETS_DIR / "weather_icons"
 
-# Weather Code to Icon Mapping
+# Weather Code to Icon Mapping (Twemoji icons)
+# Complete mapping for all 23 Israel forecast codes
 WEATHER_ICONS = {
-    '1250': 'sunny.png',          # Clear/Sunny
-    '1220': 'partly_cloudy.png',  # Partly Cloudy
-    '1310': 'mostly_clear.png',   # Mostly Clear
-    '1580': 'very_hot.png',       # Very Hot/Sunny
+    # Clear/Sunny (3 codes → 1 icon)
+    '1250': '1250_clear.png',          # Clear
+    '1310': '1250_clear.png',          # Hot
+    '1580': '1250_clear.png',          # Extremely hot
+
+    # Partly Cloudy (1 code)
+    '1220': '1220_partly_cloudy.png',  # Partly cloudy
+
+    # Cloudy (2 codes → 1 icon)
+    '1230': '1230_cloudy.png',         # Cloudy
+    '1540': '1230_cloudy.png',         # Cloudy, possible rain
+
+    # Partly Cloudy + Rain (1 code)
+    '1530': '1530_partly_cloudy_rain.png',  # Partly cloudy, possible rain
+
+    # Rain (2 codes → 1 icon)
+    '1140': '1140_rainy.png',          # Rainy
+    '1560': '1140_rainy.png',          # Cloudy, light rain
+
+    # Thunderstorms (2 codes → 1 icon)
+    '1020': '1020_thunderstorms.png',  # Thunderstorms
+    '1510': '1020_thunderstorms.png',  # Stormy
+
+    # Snow (4 codes → 1 icon)
+    '1060': '1060_snow.png',           # Snow
+    '1070': '1060_snow.png',           # Light snow
+    '1080': '1060_snow.png',           # Sleet
+    '1520': '1060_snow.png',           # Heavy snow
+
+    # Fog/Dust/Sandstorms (3 codes → 1 icon)
+    '1160': '1160_fog.png',            # Fog
+    '1570': '1160_fog.png',            # Dust
+    '1010': '1160_fog.png',            # Sandstorms
+
+    # Wind (1 code)
+    '1260': '1260_windy.png',          # Windy
+
+    # Cold/Frost (3 codes → 1 icon)
+    '1300': '1300_frost.png',          # Frost
+    '1320': '1300_frost.png',          # Cold
+    '1590': '1300_frost.png',          # Extremely cold
+
+    # Muggy (1 code)
+    '1270': '1270_muggy.png',          # Muggy
 }
 
 
@@ -144,8 +185,8 @@ def load_weather_icon(weather_code: str, size: int) -> Image.Image:
     Returns:
         PIL Image of weather icon, resized to specified size
     """
-    # Get icon filename from mapping, with fallback
-    icon_filename = WEATHER_ICONS.get(weather_code, 'mostly_clear.png')
+    # Get icon filename from mapping, with fallback to clear/sunny
+    icon_filename = WEATHER_ICONS.get(weather_code, '1250_clear.png')
     icon_path = WEATHER_ICONS_DIR / icon_filename
 
     try:

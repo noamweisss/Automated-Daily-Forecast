@@ -5,6 +5,74 @@ All notable changes to the IMS Weather Forecast Automation project will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.0] - 2025-11-03
+
+### Phase 3.5 Complete: Complete Weather Icon Set ✅
+
+**Feature Release:** Implemented comprehensive weather icon system covering all 23 IMS Israel forecast codes using Twemoji icon set.
+
+### Added
+- **Complete Weather Icon Set**: 11 unique Twemoji icons covering all 23 IMS codes
+  - Source: Twemoji by Twitter, Inc. (https://github.com/twitter/twemoji)
+  - License: CC-BY 4.0 with attribution
+  - Format: PNG (72x72px) with RGBA transparency
+  - CDN: jsdelivr.net for reliable downloads
+- **Icon Files**: Downloaded and organized 11 weather icons:
+  - 1250_clear.png (☀ Sun) - Clear, Hot, Extremely Hot
+  - 1220_partly_cloudy.png (⛅ Sun Behind Cloud) - Partly Cloudy
+  - 1230_cloudy.png (☁ Cloud) - Cloudy conditions
+  - 1530_partly_cloudy_rain.png (🌦 Sun Behind Rain Cloud) - Partly cloudy with rain
+  - 1140_rainy.png (🌧 Cloud With Rain) - Rain conditions
+  - 1020_thunderstorms.png (⛈ Lightning And Rain) - Storms
+  - 1060_snow.png (🌨 Cloud With Snow) - All snow conditions
+  - 1160_fog.png (🌫 Fog) - Fog, Dust, Sandstorms
+  - 1260_windy.png (🌬 Wind Face) - Windy
+  - 1300_frost.png (❄ Snowflake) - Cold conditions
+  - 1270_muggy.png (💧 Droplet) - Muggy/Humid
+- **Attribution File**: `assets/weather_icons/ATTRIBUTION.txt`
+  - Complete Twemoji license documentation
+  - Icon usage mapping
+  - Download source documentation
+- **IMS Weather Codes Documentation**: `ims_weather_codes.json`
+  - Complete mapping of 23 Israel forecast codes
+  - 31 worldwide forecast codes
+  - Wind direction codes
+  - Extracted from official IMS documentation (CodesForIMSWebSite_1.pdf)
+- **Phase 3.5 Strategy Document**: `docs/PHASE_3.5_ICON_STRATEGY.md`
+  - Complete icon implementation documentation
+  - Icon sourcing research and evaluation
+  - Final icon mapping table
+  - Implementation timeline
+
+### Changed
+- **generate_forecast_image.py**:
+  - Expanded `WEATHER_ICONS` dictionary from 4 to 23 codes (lines 80-127)
+  - Updated fallback icon from `mostly_clear.png` to `1250_clear.png`
+  - Multiple codes now share icons for visual consistency
+  - Complete coverage: Clear (3 codes), Cloudy (2), Rain (2), Thunderstorms (2), Snow (4), Fog/Dust (3), Cold/Frost (3), Wind (1), Muggy (1)
+- **CLAUDE.md**:
+  - Updated Weather Icons section with Twemoji details
+  - Added complete icon source, license, and coverage information
+  - Updated Known Weather Codes section with reference to full documentation
+  - Removed note about incomplete weather code mapping
+- **README.md**: Updated project status to Phase 3.5 Complete
+
+### Improved
+- **Visual Consistency**: Single icon set (Twemoji) ensures uniform aesthetic
+- **License Compliance**: Proper CC-BY 4.0 attribution documentation
+- **Icon Coverage**: 100% coverage of all IMS Israel forecast codes (23/23)
+- **Maintainability**: Clear mapping in code with descriptive comments
+- **Scalability**: Easy to add new codes by mapping to existing icons
+
+### Implementation Details
+- **Strategy**: Use single consistent icon set with multiple codes mapping to same icon
+- **Rationale**: Visual consistency more important than unique icons per code
+- **Example**: All snow types (Light snow, Heavy snow, Sleet) use same snow icon
+- **Fallback**: Generic clear/sunny icon for any unknown future codes
+- **Testing**: Verified with real IMS forecast data (codes 1220, 1250)
+
+---
+
 ## [3.0.1] - 2025-10-30
 
 ### Documentation & Hebrew Rendering Enhancements

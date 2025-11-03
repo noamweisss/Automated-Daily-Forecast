@@ -1,0 +1,49 @@
+Weather Icon Attribution
+========================
+
+Icon Set: Twemoji
+Creator: Twitter, Inc. and other contributors
+Source: https://github.com/twitter/twemoji
+Version: Latest (as of November 3, 2025)
+
+License
+-------
+Graphics: CC-BY 4.0
+License URL: https://creativecommons.org/licenses/by/4.0/
+Code: MIT License
+
+Attribution Text
+----------------
+Weather icons provided by Twemoji (https://twemoji.twitter.com/)
+Copyright Twitter, Inc. and other contributors
+Licensed under CC-BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+
+Icons Used
+----------
+The following 11 unique Twemoji icons are used in this project,
+mapped to 23 IMS weather forecast codes:
+
+1. 2600.png  → ☀ Sun (Clear, Hot, Extremely hot)
+2. 26c5.png  → ⛅ Sun Behind Cloud (Partly cloudy)
+3. 2601.png  → ☁ Cloud (Cloudy, Cloudy possible rain)
+4. 1f326.png → 🌦 Sun Behind Rain Cloud (Partly cloudy possible rain)
+5. 1f327.png → 🌧 Cloud With Rain (Rainy, Cloudy light rain)
+6. 26c8.png  → ⛈ Cloud With Lightning And Rain (Thunderstorms, Stormy)
+7. 1f328.png → 🌨 Cloud With Snow (Snow, Light snow, Sleet, Heavy snow)
+8. 1f32b.png → 🌫 Fog (Fog, Dust, Sandstorms)
+9. 1f32c.png → 🌬 Wind Face (Windy)
+10. 2744.png → ❄ Snowflake (Frost, Cold, Extremely cold)
+11. 1f4a7.png → 💧 Droplet (Muggy)
+
+Usage
+-----
+These icons are used in the automated weather forecast image generation
+for Instagram stories, displaying weather conditions for 15 Israeli cities.
+
+Downloaded: November 3, 2025
+Downloaded from: https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/
+
+Contact
+-------
+For questions about this attribution or icon usage, contact the project maintainer.
+For questions about Twemoji licensing, visit: https://github.com/twitter/twemoji

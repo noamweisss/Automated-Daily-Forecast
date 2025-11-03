@@ -155,10 +155,13 @@ pip install -r requirements.txt
 
 **Weather Icons:**
 - Location: `assets/weather_icons/`
-- Format: PNG with transparency (RGBA)
-- Mapping: `WEATHER_ICONS` dict in generate_image.py
-- Known codes: 1250 (sunny), 1220 (partly cloudy), 1310 (mostly clear), 1580 (very hot)
-- Fallback: mostly_clear.png if code not found
+- Format: PNG with transparency (RGBA), 72x72px source
+- Source: Twemoji by Twitter, Inc. (https://github.com/twitter/twemoji)
+- License: CC-BY 4.0 (attribution in `assets/weather_icons/ATTRIBUTION.txt`)
+- Mapping: `WEATHER_ICONS` dict in generate_forecast_image.py
+- Total: 11 unique icons covering all 23 IMS Israel forecast codes
+- Fallback: 1250_clear.png if unknown code encountered
+- Complete mapping available in: `docs/PHASE_3.5_ICON_STRATEGY.md`
 
 ### Key Configuration Values
 
@@ -445,14 +448,20 @@ python generate_forecast_image.py  # May fail if cwd is wrong
 
 **Days 2-4:** Typically only temperature and weather code
 
-### Known Weather Codes
+### Weather Codes
 
+**Complete mapping available:** All 23 Israel forecast codes documented in `ims_weather_codes.json` and `docs/PHASE_3.5_ICON_STRATEGY.md`
+
+**Common codes:**
 - 1250: Clear/Sunny
 - 1220: Partly Cloudy
-- 1310: Mostly Clear
-- 1580: Very Hot/Sunny
+- 1140: Rainy
+- 1020: Thunderstorms
+- 1230: Cloudy
+- 1310: Hot
+- 1580: Extremely Hot
 
-*Note: Full weather code mapping incomplete - may need research/reverse-engineering from historical data*
+**Icon coverage:** All 23 codes have corresponding Twemoji icons (11 unique icons, with multiple codes sharing icons for visual consistency)
 
 ## Common Pitfalls
 
