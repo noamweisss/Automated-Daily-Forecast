@@ -19,6 +19,7 @@ from utils import setup_logging, get_today_date, print_separator
 from download_forecast import download_and_convert
 from extract_forecast import extract_forecast
 from generate_forecast_image import generate_all_cities_image
+from send_email import send_forecast_email
 
 
 # ============================================================================
@@ -30,7 +31,7 @@ from generate_forecast_image import generate_all_cities_image
 # Phase 3: All 15 cities image generation
 # Phase 4: Add email delivery
 
-CURRENT_PHASE = 3
+CURRENT_PHASE = 4
 
 
 # ============================================================================
@@ -139,12 +140,13 @@ def step_generate_image(cities_data: List[Dict], forecast_date: str, logger, dry
         return False
 
 
-def step_send_email(image_path: str, logger, dry_run: bool = False) -> bool:
+def step_send_email(image_path: str, forecast_date: str, logger, dry_run: bool = False) -> bool:
     """
-    Step 4: Send email to social media manager (Phase 4 - Not Implemented Yet).
+    Step 4: Send email to social media manager (Phase 4).
 
     Args:
         image_path: Path to generated image
+        forecast_date: Forecast date in YYYY-MM-DD format
         logger: Logger instance
         dry_run: If True, simulate without sending
 
@@ -152,14 +154,29 @@ def step_send_email(image_path: str, logger, dry_run: bool = False) -> bool:
         True if successful, False otherwise
     """
     logger.info("\n" + "=" * 60)
-    logger.info("STEP 4: SEND EMAIL (Phase 4 - Not Implemented)")
+    logger.info("STEP 4: SEND EMAIL (Phase 4)")
     logger.info("=" * 60)
 
-    logger.info("Email delivery will be implemented in Phase 4")
-    logger.info(f"Would send image: {image_path}")
+    try:
+        success = send_forecast_email(
+            image_path=image_path,
+            forecast_date=forecast_date,
+            logger=logger,
+            dry_run=dry_run
+        )
 
-    # Placeholder for future implementation
-    return True
+        if success:
+            logger.info("Email delivery completed successfully!")
+        else:
+            logger.error("Email delivery failed")
+
+        return success
+
+    except Exception as e:
+        logger.error(f"Email delivery error: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 
 # ============================================================================
@@ -233,11 +250,12 @@ def run_workflow(dry_run: bool = False, target_date: Optional[str] = None) -> bo
             logger.info("\nSkipping image generation (Phase 2/3 - not yet implemented)")
 
         # ====================================================================
-        # STEP 4: SEND EMAIL (Phase 4 - Future)
+        # STEP 4: SEND EMAIL (Phase 4)
         # ====================================================================
 
         if CURRENT_PHASE >= 4:
-            if not step_send_email("output/weather_story_DATE.jpg", logger, dry_run=dry_run):
+            output_path = Path(__file__).parent / "output" / "daily_forecast.jpg"
+            if not step_send_email(str(output_path), target_date, logger, dry_run=dry_run):
                 logger.error("Email delivery failed")
                 workflow_success = False
         else:

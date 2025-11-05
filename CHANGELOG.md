@@ -5,6 +5,154 @@ All notable changes to the IMS Weather Forecast Automation project will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2025-11-05
+
+### Phase 4 Complete: Automation & Email Delivery via GitHub Actions ✅
+
+**Major Release:** Successfully implemented automated daily workflow with email delivery using GitHub Actions and SendGrid API. The system now runs completely hands-free in the cloud.
+
+### Added
+
+#### Email Delivery System
+- **New Script: `send_email.py`** (280 lines)
+  - SendGrid API integration for professional email delivery
+  - HTML email template with Hebrew RTL support
+  - Professional design with gradient header and structured layout
+  - Image attachment with base64 encoding
+  - Environment variable configuration for security
+  - Comprehensive error handling with detailed diagnostics
+  - Command-line interface for standalone testing
+  - Dry-run mode for testing without sending
+
+#### Email Template Features
+- **Professional HTML Design**
+  - Hebrew RTL layout with proper text direction
+  - Gradient header (purple-blue) with forecast date
+  - Bilingual date display (Hebrew DD/MM/YYYY + English)
+  - Structured content sections with icons
+  - IMS branding and footer with organization details
+  - Responsive design for email clients
+  - Plain text fallback for compatibility
+
+- **Email Configuration**
+  - Subject: "תחזית יומית IMS - {date}" (Hebrew)
+  - Attachment: `ims_daily_forecast.jpg`
+  - Support for multiple recipients (comma-separated)
+  - Verified sender address requirement (SendGrid)
+
+#### GitHub Actions Automation
+- **New Workflow: `.github/workflows/daily-forecast.yml`**
+  - Scheduled execution: Daily at 6:00 AM Israel time (3:00 AM UTC)
+  - Manual trigger support via GitHub UI
+  - Dry-run mode option for testing
+  - Python 3.13 with pip dependency caching
+  - Complete workflow: Download → Extract → Generate → Email
+
+- **Workflow Features**
+  - Timeout: 15 minutes (typical run: 2-3 minutes)
+  - Artifact storage: Images (90 days), Logs (30 days)
+  - Failure notifications via GitHub email
+  - Detailed workflow summary in GitHub UI
+  - Environment variable injection from GitHub Secrets
+
+- **GitHub Secrets Configuration**
+  - `SENDGRID_API_KEY`: SendGrid API key for authentication
+  - `EMAIL_SENDER`: From email address (must be verified in SendGrid)
+  - `EMAIL_RECIPIENT`: To email address(es) - supports multiple recipients
+
+#### Documentation & Setup Instructions
+- **CLAUDE.md**: Added comprehensive GitHub Actions section
+  - Setup instructions for SendGrid and GitHub Secrets
+  - Workflow features and monitoring guide
+  - Local testing commands with environment variables
+  - Future deployment planning for Phase 5
+
+- **README.md**: Phase 4 feature section
+  - GitHub Actions automation overview
+  - Scheduled and manual execution instructions
+  - Secrets configuration guide
+  - Monitoring and artifact access
+  - Updated project structure with automation files
+
+### Changed
+
+- **forecast_workflow.py**:
+  - Updated `CURRENT_PHASE` from 3 to 4
+  - Integrated `send_email.py` import
+  - Updated `step_send_email()` from placeholder to functional implementation
+  - Added forecast_date parameter to email step
+  - Enhanced workflow orchestration with email delivery
+  - Updated documentation strings to reflect Phase 4 completion
+
+- **requirements.txt**:
+  - Added `sendgrid>=6.11.0` for email delivery
+  - Updated Phase 4 section from placeholder to active dependency
+  - Documented purpose: "Professional email delivery (Phase 4)"
+
+- **README.md**:
+  - Updated current status: "Phase 4 Complete ✅"
+  - Added GitHub Actions automation section with setup guide
+  - Expanded project structure to include `.github/workflows/`
+  - Updated dependencies list to include SendGrid
+  - Changed last updated date to November 5, 2025
+  - Updated phase status: "Phase 4 Complete ✅ | Phase 5 Planned 📅"
+
+- **CLAUDE.md**:
+  - Updated current status to Phase 4 Complete
+  - Added email testing commands to Essential Commands
+  - Updated Data Flow section with Email Delivery Phase
+  - Added `send_email.py` to Core Production Scripts
+  - Updated Phase System section with Phase 4 complete
+  - Added comprehensive GitHub Actions Automation section
+  - Updated Future Phases to Phase 5: Production Deployment
+
+### Technical Details
+
+#### SendGrid Integration
+- **API Version**: SendGrid Python SDK 6.11.0+
+- **Authentication**: API key via environment variable
+- **Email Sending**: RESTful API with python library
+- **Attachment Handling**: Base64 encoding for JPEG images
+- **Error Handling**: Specific diagnostics for 401/403/404 errors
+- **Rate Limits**: Free tier supports 100 emails/day (sufficient for daily automation)
+
+#### GitHub Actions Environment
+- **Runner**: ubuntu-latest
+- **Python**: 3.13 with pip caching
+- **Artifacts**: GitHub Actions artifact storage
+- **Secrets**: Encrypted environment variable injection
+- **Scheduling**: Cron-based (POSIX cron syntax)
+- **Triggers**: Both scheduled and manual (workflow_dispatch)
+
+#### Email Delivery Flow
+1. Generate forecast image (output/daily_forecast.jpg)
+2. Load environment variables from GitHub Secrets
+3. Format email with Hebrew/English date displays
+4. Encode image as base64 attachment
+5. Send via SendGrid API with HTML template
+6. Log delivery status and message ID
+
+### Improved
+
+- **Automation**: Completely hands-free daily workflow execution
+- **Reliability**: Cloud-based execution (no local machine dependency)
+- **Monitoring**: Built-in artifact storage and failure notifications
+- **Security**: Secrets managed by GitHub (never in code)
+- **Testing**: Dry-run mode for safe testing before production
+- **Scalability**: Easy to add more recipients or modify schedule
+- **Maintainability**: Clear separation of email logic in dedicated module
+
+### What's Next
+
+**Phase 5: Production Deployment** (Future)
+- Transition from GitHub Actions to IMS production servers
+- Linux compatibility validation (Ubuntu/RHEL)
+- IT team handoff and training documentation
+- Production monitoring and alerting setup
+- Backup and disaster recovery procedures
+
+---
+
 ## [3.5.0] - 2025-11-03
 
 ### Phase 3.5 Complete: Complete Weather Icon Set ✅
@@ -474,8 +622,16 @@ This marks the completion of Phase 1, establishing a solid foundation for automa
 ## Version History
 
 ### [Unreleased]
-- Phase 3.5: Finalizing icon gallery (weather code documentation & complete icon set)
-- Phase 4: Automation & email delivery system
+- Phase 5: Production server deployment and IT handoff
+
+### [4.0.0] - 2025-11-05
+- Phase 4 complete: Automation & email delivery via GitHub Actions
+- SendGrid API integration
+- Automated daily workflow
+
+### [3.5.0] - 2025-11-03
+- Phase 3.5 complete: Complete weather icon set with full IMS code coverage
+- Twemoji icon system
 
 ### [3.0.1] - 2025-10-30
 - Documentation enhancements and Hebrew rendering improvements
@@ -517,4 +673,4 @@ This marks the completion of Phase 1, establishing a solid foundation for automa
 ---
 
 **Maintained by:** Noam W, IMS Design Team
-**Last Updated:** October 30, 2025
+**Last Updated:** November 5, 2025

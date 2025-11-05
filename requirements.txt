@@ -22,10 +22,10 @@ python-bidi>=0.4.2
 # Phase 4: Email Delivery
 # ============================================================================
 
-# SendGrid for professional email delivery
+# SendGrid API for professional email delivery
 sendgrid>=6.11.0
 
-# Environment variable management for API keys
+# Environment variable management for local development and API keys
 python-dotenv>=1.0.0
 
 # ============================================================================

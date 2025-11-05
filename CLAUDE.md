@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 IMS Weather Forecast Automation - Automated daily weather forecast generator for Israeli cities. Downloads forecast data from Israel Meteorological Service (IMS), processes it, and generates Instagram-ready story images featuring 15 major Israeli cities.
 
-**Current Status:** Phase 3 Complete (All 15 Cities Image Generation) | Phase 4 Planned (Automation & Email)
+**Current Status:** Phase 4 Complete (Automation & Email via GitHub Actions) | Testing & Deployment Phase
 
 ## Essential Commands
 
@@ -30,6 +30,15 @@ python extract_forecast.py
 
 # Generate forecast image (all 15 cities - Phase 3)
 python generate_forecast_image.py
+
+# Test email delivery (Phase 4 - dry-run)
+python send_email.py --dry-run
+
+# Send test email (Phase 4 - requires env vars)
+export SENDGRID_API_KEY='your-api-key'
+export EMAIL_SENDER='forecast@example.com'
+export EMAIL_RECIPIENT='recipient@example.com'
+python send_email.py --image output/daily_forecast.jpg
 
 # Test image generation (Phase 2 POC - single city)
 python exploration/generate_image.py
@@ -86,8 +95,16 @@ pip install -r requirements.txt
    - Professional header with IMS logo and date aligned with list edges
    - Open Sans variable font with Hebrew support
 
-4. **Orchestration** (`forecast_workflow.py`)
+4. **Email Delivery Phase** (Phase 4 complete)
+   - Sends forecast image via SendGrid API
+   - Professional HTML email template with Hebrew support
+   - Attachment: daily_forecast.jpg (Instagram-ready)
+   - Environment variable configuration for security
+   - Supports multiple recipients (comma-separated)
+
+5. **Orchestration** (`forecast_workflow.py`)
    - Main entry point that coordinates all phases
+   - Phase-aware execution (currently Phase 4)
    - Handles dry-run mode for safe testing
    - Comprehensive logging to console + file
    - Graceful error handling with fallback strategies
@@ -96,7 +113,7 @@ pip install -r requirements.txt
 
 **forecast_workflow.py** - Main orchestration script
 - Coordinates download → extract → generate → email workflow
-- Phase-aware execution (currently Phase 3)
+- Phase-aware execution (currently Phase 4)
 - Dry-run mode support
 - Exit codes: 0 (success), 1 (failure)
 
@@ -126,6 +143,15 @@ pip install -r requirements.txt
 - File management (ensure directories, archive cleanup)
 - Data validation (city count, required fields)
 - Formatting utilities
+
+**send_email.py** - Email delivery via SendGrid (Phase 4)
+- SendGrid API integration for professional email delivery
+- HTML email template with Hebrew RTL support
+- Image attachment with base64 encoding
+- Environment variable configuration (SENDGRID_API_KEY, EMAIL_SENDER, EMAIL_RECIPIENT)
+- Dry-run mode for testing without sending
+- Comprehensive error handling with helpful diagnostics
+- Command-line interface for standalone testing
 
 ### Image Generation System (Phase 3)
 
@@ -328,10 +354,11 @@ The project follows an incremental phase system:
 - **Phase 1:** Download + Extraction (COMPLETE)
 - **Phase 2:** Single city image generation POC (COMPLETE)
 - **Phase 3:** Full design with all 15 cities (COMPLETE)
-- **Phase 4:** Automation + Email delivery (PLANNED)
+- **Phase 3.5:** Weather icon system with full IMS code coverage (COMPLETE)
+- **Phase 4:** Automation + Email delivery via GitHub Actions (COMPLETE)
 - **Phase 5:** Server deployment (FUTURE)
 
-**CURRENT_PHASE** constant in forecast_workflow.py controls which steps execute.
+**CURRENT_PHASE** constant in forecast_workflow.py controls which steps execute (currently set to 4).
 
 ### Making Changes to Design
 
@@ -495,16 +522,65 @@ python generate_forecast_image.py  # May fail if cwd is wrong
    - Claude Code may reset working directory between bash commands
    - In bash: Use `cd /full/path && command` or absolute paths
 
+## GitHub Actions Automation (Phase 4)
+
+### Setup Instructions
+
+**1. Configure SendGrid:**
+- Sign up at https://sendgrid.com (free tier: 100 emails/day)
+- Verify sender email address
+- Generate API key (Settings → API Keys)
+
+**2. Configure GitHub Secrets:**
+Go to: Repository Settings → Secrets and variables → Actions → New repository secret
+
+Add three secrets:
+- `SENDGRID_API_KEY`: Your SendGrid API key
+- `EMAIL_SENDER`: From email (must be verified in SendGrid)
+- `EMAIL_RECIPIENT`: To email(s) - comma-separated for multiple
+
+**3. Enable GitHub Actions:**
+- Workflow file: `.github/workflows/daily-forecast.yml`
+- Scheduled run: 6:00 AM Israel time (3:00 AM UTC)
+- Manual trigger: Actions tab → Run workflow
+
+**4. Monitor Execution:**
+- View runs: Actions tab in GitHub
+- Download artifacts: Images and logs available for 90 days
+- Email notifications: GitHub sends alerts on failures
+
+### Workflow Features
+
+- **Scheduled execution:** Cron job runs daily at 6:00 AM Israel time
+- **Manual trigger:** Can run anytime via GitHub UI
+- **Dry-run mode:** Test without sending email
+- **Artifact storage:** Generated images kept for 90 days
+- **Log persistence:** Automation logs kept for 30 days
+- **Failure notifications:** GitHub emails on errors
+
+### Testing Workflow
+
+```bash
+# Test locally with dry-run
+export SENDGRID_API_KEY='your-key'
+export EMAIL_SENDER='sender@example.com'
+export EMAIL_RECIPIENT='recipient@example.com'
+python forecast_workflow.py --dry-run
+
+# Test locally with real email
+python forecast_workflow.py
+
+# Test on GitHub Actions (manual trigger)
+# Go to: Actions → IMS Daily Weather Forecast → Run workflow
+# Select "dry_run: true" for testing
+```
+
 ## Future Phases
 
-### Phase 4: Automation (Next Phase)
+### Phase 5: Production Deployment
 
-- Windows Task Scheduler integration (6:00 AM daily)
-- Email delivery to social media team (smtplib)
-- Error notification system
-
-### Phase 5: Deployment
-
-- Deploy to IMS production servers
-- Linux compatibility testing
-- IT team handoff documentation
+- Transition from GitHub Actions to IMS production servers
+- Linux compatibility validation (Ubuntu/RHEL)
+- IT team handoff and training documentation
+- Production monitoring and alerting setup
+- Backup and disaster recovery procedures
