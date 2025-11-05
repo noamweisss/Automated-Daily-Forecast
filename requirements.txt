@@ -19,10 +19,14 @@ Pillow>=10.0.0
 python-bidi>=0.4.2
 
 # ============================================================================
-# Phase 4: Email Delivery (Future)
+# Phase 4: Email Delivery
 # ============================================================================
 
-# Email functionality is built-in with smtplib (no external dependency needed)
+# SendGrid for professional email delivery
+sendgrid>=6.11.0
+
+# Environment variable management for API keys
+python-dotenv>=1.0.0
 
 # ============================================================================
 # Development Dependencies (Optional)

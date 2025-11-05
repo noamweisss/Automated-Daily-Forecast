@@ -20,6 +20,9 @@ ENV/
 # Project-Specific
 # ============================================================================
 
+# Environment variables (contains API keys and secrets)
+.env
+
 # Log files (we keep the logs/ folder structure but not the actual logs)
 logs/*.log
 logs/*.txt
