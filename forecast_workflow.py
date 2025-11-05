@@ -221,7 +221,9 @@ def run_workflow(dry_run: bool = False, target_date: Optional[str] = None) -> bo
     # STEP 1: DOWNLOAD XML
     # ========================================================================
 
-    if not step_download(logger, dry_run=dry_run):
+    # Note: Always download XML even in dry-run mode (extraction needs the file)
+    # Dry-run only affects image generation and email sending
+    if not step_download(logger, dry_run=False):
         logger.error("Workflow aborted: Download failed")
         logger.info("Note: Extraction will attempt to use existing/archived XML")
         # Don't abort yet - extraction might work with existing data

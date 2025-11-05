@@ -90,8 +90,8 @@ jobs:
         env:
           # SendGrid credentials from GitHub Secrets
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
-          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+          TO_EMAIL: ${{ secrets.TO_EMAIL }}
         run: |
           # Check if dry-run mode is enabled
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then

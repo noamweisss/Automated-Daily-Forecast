@@ -6,8 +6,8 @@ Designed for automated execution via GitHub Actions or local scheduling.
 
 Environment Variables Required:
     SENDGRID_API_KEY: SendGrid API key for authentication
-    EMAIL_SENDER: Sender email address (must be verified in SendGrid)
-    EMAIL_RECIPIENT: Recipient email address(es) - comma-separated for multiple
+    FROM_EMAIL: Sender email address (must be verified in SendGrid)
+    TO_EMAIL: Recipient email address(es) - comma-separated for multiple
 
 Usage:
     from send_email import send_forecast_email
@@ -219,8 +219,8 @@ def send_forecast_email(
 
     Environment Variables:
         SENDGRID_API_KEY: SendGrid API key
-        EMAIL_SENDER: From address (must be verified in SendGrid)
-        EMAIL_RECIPIENT: To address(es) - comma-separated for multiple
+        FROM_EMAIL: From address (must be verified in SendGrid)
+        TO_EMAIL: To address(es) - comma-separated for multiple
     """
 
     logger.info("=" * 60)
@@ -232,8 +232,8 @@ def send_forecast_email(
     # ========================================================================
 
     api_key = os.environ.get('SENDGRID_API_KEY')
-    sender_email = os.environ.get('EMAIL_SENDER')
-    recipient_emails = os.environ.get('EMAIL_RECIPIENT')
+    sender_email = os.environ.get('FROM_EMAIL')
+    recipient_emails = os.environ.get('TO_EMAIL')
 
     if not api_key:
         logger.error("Missing environment variable: SENDGRID_API_KEY")
@@ -241,13 +241,13 @@ def send_forecast_email(
         return False
 
     if not sender_email:
-        logger.error("Missing environment variable: EMAIL_SENDER")
-        logger.error("Set with: export EMAIL_SENDER='forecast@example.com'")
+        logger.error("Missing environment variable: FROM_EMAIL")
+        logger.error("Set with: export FROM_EMAIL='forecast@example.com'")
         return False
 
     if not recipient_emails:
-        logger.error("Missing environment variable: EMAIL_RECIPIENT")
-        logger.error("Set with: export EMAIL_RECIPIENT='recipient@example.com'")
+        logger.error("Missing environment variable: TO_EMAIL")
+        logger.error("Set with: export TO_EMAIL='recipient@example.com'")
         return False
 
     # Parse multiple recipients (comma-separated)
@@ -404,8 +404,8 @@ def main():
         epilog="""
 Environment Variables Required:
   SENDGRID_API_KEY    SendGrid API key
-  EMAIL_SENDER        From email address (verified in SendGrid)
-  EMAIL_RECIPIENT     To email address(es) - comma-separated
+  FROM_EMAIL          From email address (verified in SendGrid)
+  TO_EMAIL            To email address(es) - comma-separated
 
 Examples:
   # Dry run (test without sending)
