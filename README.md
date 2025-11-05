@@ -6,7 +6,7 @@
 
 This project automates the creation of daily weather forecast images for the Israel Meteorological Service (IMS) social media accounts. It downloads forecast data from IMS, processes it, and generates beautifully designed Instagram story images featuring 15 major Israeli cities.
 
-**Current Status:** Phase 3 Complete ✅ - All 15 Cities Image Generation
+**Current Status:** Phase 4 Complete ✅ - Automation & Email Delivery via GitHub Actions
 
 ## Features
 
@@ -38,16 +38,20 @@ This project automates the creation of daily weather forecast images for the Isr
 - ✅ Header elements aligned with main list edges
 - ✅ Production-ready design (generate_forecast_image.py)
 
-### phase 3.5: Finalizing The Icon Gallery 📅 PLANNED - Next ToDo
-- Transforming the official IMS documentation from a hebrew PDF to a format easily accessible by our code
-- Finding online a full set of weather icon to go with the full tablr of the IMS codes
-- Only if no such fitting set is found, illustrating them manualy and providing SVG files
-- making sure the script works with all icons and not only the few test ones we used as placeholders
+### phase 3.5: Finalizing The Icon Gallery ✅ COMPLETE
+- ✅ Transformed official IMS documentation from Hebrew PDF to JSON format
+- ✅ Found complete Twemoji icon set covering all 23 IMS weather codes
+- ✅ Mapped all weather codes to appropriate icons (11 unique icons)
+- ✅ Full icon coverage with proper attribution (CC-BY 4.0)
 
-### Phase 4: Automation & Delivery 📅 PLANNED
-- Automated daily execution (6:00 AM)
-- Email delivery to social media team
-- Windows Task Scheduler integration
+### Phase 4: Automation & Email Delivery ✅ COMPLETE
+- ✅ SendGrid API integration for professional email delivery
+- ✅ Automated daily execution via GitHub Actions (6:00 AM Israel time)
+- ✅ HTML email template with embedded forecast image
+- ✅ Manual trigger support for testing
+- ✅ Artifact storage (images & logs) for 90 days
+- ✅ Environment variable configuration for secure credentials
+- ✅ Dry-run mode for safe testing
 
 ### Phase 5: Server Deployment 📅 FUTURE
 - Deployment to IMS production servers
@@ -116,6 +120,32 @@ python generate_forecast_image.py
 type logs\forecast_automation.log
 ```
 
+### GitHub Actions Automation (Phase 4)
+
+The project is configured to run automatically via GitHub Actions:
+
+**Scheduled Execution:**
+- Runs daily at 6:00 AM Israel time (3:00 AM UTC)
+- Downloads latest forecast from IMS
+- Generates Instagram story image
+- Sends email to configured recipients via SendGrid
+
+**Manual Execution:**
+- Go to: Actions → IMS Daily Weather Forecast → Run workflow
+- Choose dry-run mode to test without sending email
+- View generated images in workflow artifacts
+
+**Required GitHub Secrets:**
+Configure these in: Settings → Secrets and variables → Actions → New repository secret
+1. `SENDGRID_API_KEY` - Your SendGrid API key
+2. `EMAIL_SENDER` - From email address (verified in SendGrid)
+3. `EMAIL_RECIPIENT` - To email address(es) - comma-separated for multiple
+
+**Monitoring:**
+- View workflow runs: Actions tab
+- Download artifacts: Generated images and logs available for 90 days
+- Email notifications: GitHub sends email on workflow failures
+
 ## Project Structure
 
 ```
@@ -124,7 +154,8 @@ Automated Daily Forecast/
 │   ├── forecast_workflow.py      # Main orchestration script
 │   ├── download_forecast.py      # XML download & encoding
 │   ├── extract_forecast.py       # Data extraction
-│   ├── generate_image.py         # Image generation (Phase 3)
+│   ├── generate_forecast_image.py # Image generation (Phase 3)
+│   ├── send_email.py             # Email delivery (Phase 4)
 │   └── utils.py                  # Shared utilities
 │
 ├── 📁 Data & Output
@@ -134,8 +165,12 @@ Automated Daily Forecast/
 │
 ├── 📁 Assets
 │   ├── assets/logos/             # IMS logo files
-│   ├── assets/weather_icons/    # Weather emoji PNGs
+│   ├── assets/weather_icons/    # Weather emoji PNGs (Twemoji)
 │   └── fonts/                    # Open Sans variable font
+│
+├── 📁 Automation
+│   └── .github/workflows/        # GitHub Actions workflows
+│       └── daily-forecast.yml    # Daily automation (6:00 AM)
 │
 ├── 📁 Development
 │   └── exploration/              # Test & development scripts
@@ -143,6 +178,7 @@ Automated Daily Forecast/
 └── 📚 Documentation
     ├── README.md                 # This file
     ├── CHANGELOG.md              # Version history
+    ├── CLAUDE.md                 # Claude Code instructions
     ├── docs/                     # Production documentation
     │   ├── PROJECT_DOCUMENTATION.md
     │   └── PROJECT_STRUCTURE.md
@@ -270,9 +306,10 @@ This project is developed by the IMS Design & Social Media Team.
 
 ### Dependencies
 See [requirements.txt](requirements.txt) for full list:
-- `requests>=2.31.0` - XML download
-- `Pillow>=10.0.0` - Image generation
-- `python-bidi>=0.4.2` - Hebrew RTL text support
+- `requests>=2.31.0` - XML download from IMS
+- `Pillow>=10.0.0` - Image generation with Hebrew RTL support
+- `python-bidi>=0.4.2` - Hebrew RTL text rendering
+- `sendgrid>=6.11.0` - Professional email delivery (Phase 4)
 
 ## Data Source
 
@@ -296,5 +333,5 @@ For deployment questions, consult IMS IT Department.
 
 ---
 
-**Last Updated:** October 30, 2025
-**Phase Status:** Phase 3 Complete ✅ | Phase 4 Planned 📅
+**Last Updated:** November 5, 2025
+**Phase Status:** Phase 4 Complete ✅ | Phase 5 Planned 📅

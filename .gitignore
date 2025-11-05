@@ -50,9 +50,6 @@ isr_cities_utf8.xml
 # Claude Code IDE
 .claude/
 
-# GitHub Actions / CI
-.github/
-
 # PyCharm
 .idea/
 
