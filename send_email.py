@@ -23,6 +23,7 @@ Usage:
 import os
 import sys
 import base64
+import traceback
 from pathlib import Path
 from typing import Optional
 from datetime import datetime
@@ -30,7 +31,8 @@ from datetime import datetime
 # SendGrid imports
 try:
     from sendgrid import SendGridAPIClient
-    from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+    from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition, To, Cc
+    import sendgrid
 except ImportError:
     print("ERROR: SendGrid library not installed")
     print("Install with: pip install sendgrid")
@@ -227,6 +229,13 @@ def send_forecast_email(
     logger.info("EMAIL DELIVERY")
     logger.info("=" * 60)
 
+    # Log SendGrid version for debugging
+    try:
+        sendgrid_version = sendgrid.__version__
+        logger.info(f"SendGrid library version: {sendgrid_version}")
+    except AttributeError:
+        logger.warning("Unable to determine SendGrid library version")
+
     # ========================================================================
     # VALIDATE ENVIRONMENT VARIABLES
     # ========================================================================
@@ -255,6 +264,7 @@ def send_forecast_email(
 
     logger.info(f"Sender: {sender_email}")
     logger.info(f"Recipients: {', '.join(recipient_list)}")
+    logger.info(f"Recipient count: {len(recipient_list)} (1 To, {len(recipient_list) - 1} CC)" if len(recipient_list) > 1 else f"Recipient count: 1 (To only)")
 
     # ========================================================================
     # VALIDATE IMAGE FILE
@@ -333,21 +343,27 @@ def send_forecast_email(
 
     try:
         # Create message for first recipient
+        # IMPORTANT: Wrap emails in To() and Cc() objects to avoid KeyError: 'email'
+        logger.info("Building email message...")
         message = Mail(
             from_email=sender_email,
-            to_emails=recipient_list[0],  # Primary recipient
+            to_emails=To(recipient_list[0]),  # Wrap primary recipient in To() object
             subject=subject,
             plain_text_content=plain_body,
             html_content=html_body
         )
+        logger.info(f"  Primary recipient: {recipient_list[0]}")
 
         # Add CC recipients if multiple
         if len(recipient_list) > 1:
+            logger.info(f"  Adding {len(recipient_list) - 1} CC recipient(s)...")
             for cc_email in recipient_list[1:]:
-                message.add_cc(cc_email)
+                message.add_cc(Cc(cc_email))  # Wrap CC email in Cc() object
+                logger.info(f"    CC: {cc_email}")
 
         # Add attachment
         message.attachment = attachment
+        logger.info("  Attachment added")
 
         # Send via SendGrid
         logger.info("\nSending email via SendGrid API...")
@@ -368,23 +384,52 @@ def send_forecast_email(
 
     except Exception as e:
         logger.error(f"✗ Failed to send email: {e}")
+        logger.error(f"✗ Exception type: {type(e).__name__}")
 
-        # Provide helpful error messages
+        # Log full traceback for detailed debugging
+        logger.error("\n" + "=" * 60)
+        logger.error("FULL EXCEPTION TRACEBACK:")
+        logger.error("=" * 60)
+        tb_str = traceback.format_exc()
+        for line in tb_str.split('\n'):
+            if line.strip():
+                logger.error(line)
+        logger.error("=" * 60)
+
+        # Log context information
+        logger.error("\nCONTEXT INFORMATION:")
+        logger.error(f"  Sender email: {sender_email}")
+        logger.error(f"  Recipient count: {len(recipient_list)}")
+        logger.error(f"  Primary recipient: {recipient_list[0] if recipient_list else 'N/A'}")
+        if len(recipient_list) > 1:
+            logger.error(f"  CC recipients: {len(recipient_list) - 1}")
+        logger.error(f"  Subject: {subject}")
+        logger.error(f"  Attachment size: {file_size_mb:.2f} MB")
+
+        # Provide helpful error messages based on common issues
         error_str = str(e).lower()
 
-        if 'unauthorized' in error_str or '401' in error_str:
-            logger.error("\nPossible causes:")
-            logger.error("  1. Invalid SendGrid API key")
-            logger.error("  2. API key not activated")
-            logger.error("  3. API key doesn't have mail.send permission")
+        logger.error("\nDIAGNOSTIC SUGGESTIONS:")
+        if 'keyerror' in error_str and 'email' in error_str:
+            logger.error("  → KeyError: 'email' detected")
+            logger.error("     This typically means SendGrid library expects Email objects")
+            logger.error("     Check that To() and Cc() wrappers are used correctly")
+            logger.error(f"     SendGrid version: {getattr(sendgrid, '__version__', 'unknown')}")
+        elif 'unauthorized' in error_str or '401' in error_str:
+            logger.error("  → Authentication Error (401):")
+            logger.error("     1. Invalid SendGrid API key")
+            logger.error("     2. API key not activated")
+            logger.error("     3. API key doesn't have mail.send permission")
         elif 'forbidden' in error_str or '403' in error_str:
-            logger.error("\nPossible causes:")
-            logger.error("  1. Sender email not verified in SendGrid")
-            logger.error("  2. SendGrid account suspended")
-            logger.error("  3. Insufficient permissions")
+            logger.error("  → Permission Error (403):")
+            logger.error("     1. Sender email not verified in SendGrid")
+            logger.error("     2. SendGrid account suspended")
+            logger.error("     3. Insufficient permissions")
         elif 'not found' in error_str or '404' in error_str:
-            logger.error("\nPossible cause:")
-            logger.error("  SendGrid API endpoint not found - check library version")
+            logger.error("  → Not Found Error (404):")
+            logger.error("     SendGrid API endpoint not found - check library version")
+        else:
+            logger.error("  → Unknown error - see traceback above for details")
 
         return False
 
