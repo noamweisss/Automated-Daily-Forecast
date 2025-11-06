@@ -20,14 +20,6 @@ from download_forecast import download_and_convert
 from extract_forecast import extract_forecast
 from generate_forecast_image import generate_all_cities_image
 
-try:
-    from send_email import send_forecast_email
-except ImportError as e:
-    # This will be handled gracefully in the main workflow
-    # We allow the import to fail here so that the logger can be initialized
-    # and capture the error in the main function.
-    pass
-
 
 # ============================================================================
 # WORKFLOW CONFIGURATION
@@ -165,6 +157,7 @@ def step_send_email(image_path: str, forecast_date: str, logger, dry_run: bool =
     logger.info("=" * 60)
 
     try:
+        from send_email import send_forecast_email
         success = send_forecast_email(
             image_path=image_path,
             forecast_date=forecast_date,
@@ -179,6 +172,10 @@ def step_send_email(image_path: str, forecast_date: str, logger, dry_run: bool =
 
         return success
 
+    except ImportError:
+        logger.error("Email delivery failed: 'sendgrid' library not installed.")
+        logger.error("Please install it with: pip install sendgrid")
+        return False
     except Exception as e:
         logger.error(f"Email delivery error: {e}")
         import traceback
