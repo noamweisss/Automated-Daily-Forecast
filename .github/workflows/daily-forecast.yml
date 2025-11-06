@@ -88,10 +88,12 @@ jobs:
 
       - name: 🚀 Run Forecast Workflow
         env:
-          # SendGrid credentials from GitHub Secrets
-          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
-          TO_EMAIL: ${{ secrets.TO_EMAIL }}
+          # SMTP credentials from GitHub Secrets (Phase 4c - SMTP)
+          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
         run: |
           # Check if dry-run mode is enabled
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
@@ -148,7 +150,7 @@ jobs:
           echo "- ✅ Download XML from IMS" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Extract forecast data (15 cities)" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Generate Instagram story image" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Send email via SendGrid" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Send email via SMTP (Phase 4c)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🔗 Quick Links" >> $GITHUB_STEP_SUMMARY
           echo "- [View Generated Image](../artifacts/forecast-image-${{ github.run_number }})" >> $GITHUB_STEP_SUMMARY
