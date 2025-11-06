@@ -19,7 +19,14 @@ from utils import setup_logging, get_today_date, print_separator
 from download_forecast import download_and_convert
 from extract_forecast import extract_forecast
 from generate_forecast_image import generate_all_cities_image
-from send_email import send_forecast_email
+
+try:
+    from send_email import send_forecast_email
+except ImportError as e:
+    # This will be handled gracefully in the main workflow
+    # We allow the import to fail here so that the logger can be initialized
+    # and capture the error in the main function.
+    pass
 
 
 # ============================================================================
@@ -256,10 +263,15 @@ def run_workflow(dry_run: bool = False, target_date: Optional[str] = None) -> bo
         # ====================================================================
 
         if CURRENT_PHASE >= 4:
-            output_path = Path(__file__).parent / "output" / "daily_forecast.jpg"
-            if not step_send_email(str(output_path), target_date, logger, dry_run=dry_run):
-                logger.error("Email delivery failed")
+            if 'send_forecast_email' not in globals():
+                logger.critical("Email sending is enabled, but the 'sendgrid' library is not installed.")
+                logger.critical("Please install it with: pip install sendgrid")
                 workflow_success = False
+            else:
+                output_path = Path(__file__).parent / "output" / "daily_forecast.jpg"
+                if not step_send_email(str(output_path), target_date, logger, dry_run=dry_run):
+                    logger.error("Email delivery failed")
+                    workflow_success = False
         else:
             logger.info("\nSkipping email delivery (Phase 4 - not yet implemented)")
 

@@ -28,13 +28,15 @@ from typing import Optional
 from datetime import datetime
 
 # SendGrid imports
-try:
-    from sendgrid import SendGridAPIClient
-    from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
-except ImportError:
-    print("ERROR: SendGrid library not installed")
-    print("Install with: pip install sendgrid")
-    sys.exit(1)
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import (
+    Mail,
+    Attachment,
+    FileContent,
+    FileName,
+    FileType,
+    Disposition
+)
 
 
 # ============================================================================
