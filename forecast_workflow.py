@@ -261,14 +261,13 @@ def run_workflow(dry_run: bool = False, target_date: Optional[str] = None) -> bo
 
         if CURRENT_PHASE >= 4:
             if 'send_forecast_email' not in globals():
-                logger.critical("Email sending is enabled, but the 'sendgrid' library is not installed.")
-                logger.critical("Please install it with: pip install sendgrid")
-                workflow_success = False
+                logger.warning("Email sending is enabled, but the 'sendgrid' library is not installed.")
+                logger.warning("Skipping email delivery.")
             else:
                 output_path = Path(__file__).parent / "output" / "daily_forecast.jpg"
                 if not step_send_email(str(output_path), target_date, logger, dry_run=dry_run):
                     logger.error("Email delivery failed")
-                    workflow_success = False
+                    # Do not set workflow_success to False, as this is not a critical failure.
         else:
             logger.info("\nSkipping email delivery (Phase 4 - not yet implemented)")
 
