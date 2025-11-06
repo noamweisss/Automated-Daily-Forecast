@@ -31,7 +31,7 @@ from datetime import datetime
 # SendGrid imports
 try:
     from sendgrid import SendGridAPIClient
-    from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition, Email, Cc
+    from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition, To, Cc
     import sendgrid
 except ImportError:
     print("ERROR: SendGrid library not installed")
@@ -343,12 +343,12 @@ def send_forecast_email(
 
     try:
         # Create message for first recipient
-        # IMPORTANT: Wrap emails in Email() and Cc() objects to avoid KeyError: 'email'
-        # Note: Use Email() for to_emails (not To() which is for personalizations)
+        # IMPORTANT: Use To() and Cc() objects with email parameter explicitly named
+        # The SendGrid API requires these wrapper objects with proper parameter names
         logger.info("Building email message...")
         message = Mail(
             from_email=sender_email,
-            to_emails=Email(recipient_list[0]),  # Wrap primary recipient in Email() object
+            to_emails=To(email=recipient_list[0]),  # To() with email= parameter
             subject=subject,
             plain_text_content=plain_body,
             html_content=html_body
@@ -359,7 +359,7 @@ def send_forecast_email(
         if len(recipient_list) > 1:
             logger.info(f"  Adding {len(recipient_list) - 1} CC recipient(s)...")
             for cc_email in recipient_list[1:]:
-                message.add_cc(Cc(cc_email))  # Wrap CC email in Cc() object
+                message.add_cc(Cc(email=cc_email))  # Cc() with email= parameter
                 logger.info(f"    CC: {cc_email}")
 
         # Add attachment
