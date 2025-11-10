@@ -445,7 +445,7 @@ def draw_city_row(image: Image.Image, draw: ImageDraw.Draw, city_data: dict,
         y_position: Top Y coordinate of this row
         font_city: Font for city name
         font_temp: Font for temperature
-        gradient_colors: Tuple of (top_color, bottom_color) for adaptive separator
+        gradient_colors: Tuple of (top_color, bottom_color) - kept for API compatibility
         is_last_row: If True, don't draw separator line below
     """
     # Prepare text content
@@ -502,14 +502,9 @@ def draw_city_row(image: Image.Image, draw: ImageDraw.Draw, city_data: dict,
     # Draw separator line below row (except for last row)
     if not is_last_row:
         separator_y = y_position + ROW_HEIGHT
-
-        # Calculate adaptive separator color based on gradient background
-        bg_color = calculate_gradient_color_at_position(separator_y, gradient_colors)
-        separator_color = calculate_separator_color(bg_color)
-
-        # Draw separator line with adaptive color
+        # Draw solid black separator line
         draw.line([(ROW_PADDING, separator_y), (IMAGE_WIDTH - ROW_PADDING, separator_y)],
-                 fill=separator_color, width=1)
+                 fill=COLOR_BLACK, width=1)
 
 
 def generate_all_cities_image(cities_data: list, forecast_date: str, output_path: Path) -> bool:
