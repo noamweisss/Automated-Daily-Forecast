@@ -45,13 +45,17 @@ This project automates the creation of daily weather forecast images for the Isr
 - ✅ Full icon coverage with proper attribution (CC-BY 4.0)
 
 ### Phase 4: Automation & Email Delivery ✅ COMPLETE
-- ✅ SendGrid API integration for professional email delivery
+- ✅ SMTP integration for professional email delivery
 - ✅ Automated daily execution via GitHub Actions (6:00 AM Israel time)
 - ✅ HTML email template with embedded forecast image
 - ✅ Manual trigger support for testing
 - ✅ Artifact storage (images & logs) for 90 days
 - ✅ Environment variable configuration for secure credentials
 - ✅ Dry-run mode for safe testing
+
+### Recent Enhancements
+- ✅ **Daily Random Gradients:** The forecast image background now features a new, randomly selected gradient every day.
+- ✅ **Gradient Test Mode:** A new mode to generate test images with different gradient colors.
 
 ### Phase 5: Server Deployment 📅 FUTURE
 - Deployment to IMS production servers
@@ -70,7 +74,8 @@ This project automates the creation of daily weather forecast images for the Isr
 
 1. **Clone or download this repository:**
    ```bash
-   cd "C:\Users\noamw\Desktop\ims\Automated Daily Forecast"
+   git clone https://github.com/noamweisss/Automated-Daily-Forecast.git
+   cd Automated-Daily-Forecast
    ```
 
 2. **Install Python dependencies:**
@@ -78,16 +83,19 @@ This project automates the creation of daily weather forecast images for the Isr
    pip install -r requirements.txt
    ```
 
-3. **Verify installation:**
-   ```bash
-   python utils.py
-   ```
+3. **Set up environment variables:**
+   Create a `.env` file in the project root and add your SMTP credentials. You can copy the example file:
+    ```bash
+    cp .env.example .env
+    ```
+    Then, edit the `.env` file with your credentials.
+
 
 ### Usage
 
-#### Run the complete workflow (Phase 1)
+#### Run the complete workflow
 ```bash
-# Download today's forecast and extract data
+# Download today's forecast, generate the image, and send the email
 python forecast_workflow.py
 
 # Preview without making changes (dry-run mode)
@@ -110,17 +118,27 @@ python extract_forecast.py
 python extract_forecast.py --date 2025-10-15
 ```
 
-**Generate forecast image (Phase 3):**
+**Generate forecast image:**
 ```bash
 python generate_forecast_image.py
 ```
 
-**View logs:**
+**Send the forecast email:**
 ```bash
-type logs\forecast_automation.log
+python send_email_smtp.py
 ```
 
-### GitHub Actions Automation (Phase 4)
+**Test gradient generation:**
+```bash
+python test_gradients.py
+```
+
+**View logs:**
+```bash
+tail -f logs/forecast_automation.log
+```
+
+### GitHub Actions Automation
 
 The project is configured to run automatically via GitHub Actions:
 
@@ -128,7 +146,7 @@ The project is configured to run automatically via GitHub Actions:
 - Runs daily at 6:00 AM Israel time (3:00 AM UTC)
 - Downloads latest forecast from IMS
 - Generates Instagram story image
-- Sends email to configured recipients via SendGrid
+- Sends email to configured recipients via SMTP
 
 **Manual Execution:**
 - Go to: Actions → IMS Daily Weather Forecast → Run workflow
@@ -137,9 +155,11 @@ The project is configured to run automatically via GitHub Actions:
 
 **Required GitHub Secrets:**
 Configure these in: Settings → Secrets and variables → Actions → New repository secret
-1. `SENDGRID_API_KEY` - Your SendGrid API key
-2. `EMAIL_SENDER` - From email address (verified in SendGrid)
-3. `EMAIL_RECIPIENT` - To email address(es) - comma-separated for multiple
+1. `EMAIL_ADDRESS` - Your sender email address
+2. `EMAIL_PASSWORD` - Your email account password or app password
+3. `RECIPIENT_EMAIL` - The recipient's email address
+4. `SMTP_SERVER` - Your SMTP server address
+5. `SMTP_PORT` - Your SMTP port
 
 **Monitoring:**
 - View workflow runs: Actions tab
@@ -149,40 +169,22 @@ Configure these in: Settings → Secrets and variables → Actions → New repos
 ## Project Structure
 
 ```
-Automated Daily Forecast/
-├── 📄 Production Scripts
-│   ├── forecast_workflow.py      # Main orchestration script
-│   ├── download_forecast.py      # XML download & encoding
-│   ├── extract_forecast.py       # Data extraction
-│   ├── generate_forecast_image.py # Image generation (Phase 3)
-│   ├── send_email.py             # Email delivery (Phase 4)
-│   └── utils.py                  # Shared utilities
-│
-├── 📁 Data & Output
-│   ├── archive/                  # Historical XML (14 days)
-│   ├── logs/                     # Automation logs
-│   └── output/                   # Generated images
-│
-├── 📁 Assets
-│   ├── assets/logos/             # IMS logo files
-│   ├── assets/weather_icons/    # Weather emoji PNGs (Twemoji)
-│   └── fonts/                    # Open Sans variable font
-│
-├── 📁 Automation
-│   └── .github/workflows/        # GitHub Actions workflows
-│       └── daily-forecast.yml    # Daily automation (6:00 AM)
-│
-├── 📁 Development
-│   └── exploration/              # Test & development scripts
-│
-└── 📚 Documentation
-    ├── README.md                 # This file
-    ├── CHANGELOG.md              # Version history
-    ├── CLAUDE.md                 # Claude Code instructions
-    ├── docs/                     # Production documentation
-    │   ├── PROJECT_DOCUMENTATION.md
-    │   └── PROJECT_STRUCTURE.md
-    └── docs/dev-guides/          # Development helper guides
+Automated-Daily-Forecast/
+├── forecast_workflow.py      # Main orchestration script
+├── download_forecast.py      # XML download & encoding
+├── extract_forecast.py       # Data extraction
+├── generate_forecast_image.py # Image generation
+├── send_email_smtp.py        # Email delivery (SMTP)
+├── utils.py                  # Shared utilities
+├── archive/                  # Historical XML (14 days)
+├── assets/                   # Logos, weather icons, and fonts
+├── docs/                     # Project documentation
+├── exploration/              # Test & development scripts
+├── logs/                     # Automation logs
+├── output/                   # Generated images
+├── .github/                  # GitHub Actions workflows
+├── requirements.txt          # Python dependencies
+└── README.md                 # This file
 ```
 
 ## Weather Data
@@ -222,7 +224,7 @@ Key settings are defined in [utils.py](utils.py):
 | `EXPECTED_CITY_COUNT` | 15 cities | Number of cities we expect in the data |
 | `XML_FILE` | `isr_cities_utf8.xml` | Main working XML file |
 
-### Image Generation (Phase 3)
+### Image Generation
 Design settings in [generate_forecast_image.py](generate_forecast_image.py):
 - **Open Sans Font**: Variable axes (weight 300-800, width 75-100)
 - **Image Size**: 1080x1920px (Instagram story format)
@@ -255,19 +257,9 @@ python exploration/extract_all_cities.py
 python exploration/inspect_xml.py
 ```
 
-### Code Organization
-
-- **utils.py** - Shared utility functions (logging, validation, file management)
-- **download_forecast.py** - Handles XML download and encoding conversion
-- **extract_forecast.py** - Parses XML and extracts weather data
-- **forecast_workflow.py** - Main orchestration script that ties everything together
-
 ## Version Control
 
-This project uses Git for version control. See [GIT_GUIDE.md](GIT_GUIDE.md) for basic Git commands and workflows.
-
-### Current Version
-**v1.0.0** - Phase 1 Complete (October 2025)
+This project uses Git for version control. See [GIT_GUIDE.md](docs/dev-guides/GIT_GUIDE.md) for basic Git commands and workflows.
 
 ### Version History
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
@@ -309,7 +301,7 @@ See [requirements.txt](requirements.txt) for full list:
 - `requests>=2.31.0` - XML download from IMS
 - `Pillow>=10.0.0` - Image generation with Hebrew RTL support
 - `python-bidi>=0.4.2` - Hebrew RTL text rendering
-- `sendgrid>=6.11.0` - Professional email delivery (Phase 4)
+- `python-dotenv>=1.0.0` - Environment variable management
 
 ## Data Source
 
@@ -333,5 +325,4 @@ For deployment questions, consult IMS IT Department.
 
 ---
 
-**Last Updated:** November 5, 2025
-**Phase Status:** Phase 4 Complete ✅ | Phase 5 Planned 📅
+**Last Updated:** November 10, 2025

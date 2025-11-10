@@ -26,9 +26,9 @@ The main project documentation is located in the parent [docs/](../) folder. The
 
 **For Production Documentation:**
 - Return to [main docs](../README.md)
-- View [Project Documentation](../PROJECT_DOCUMENTATION.md)
+- View [Technical Documentation](../TECHNICAL_DOCUMENTATION.md)
 - View [Project Structure](../PROJECT_STRUCTURE.md)
 
 ---
 
-**Last Updated:** October 16, 2025
+**Last Updated:** November 10, 2025

@@ -4,14 +4,15 @@
 
 Essential documentation for the finished product:
 
-- **[Project Documentation](PROJECT_DOCUMENTATION.md)** - Comprehensive project overview, technical details, and development history
-- **[Project Structure](PROJECT_STRUCTURE.md)** - Detailed file organization and structure reference
+- **[Technical Documentation](TECHNICAL_DOCUMENTATION.md)** - Comprehensive project overview and technical details.
+- **[Project Structure](PROJECT_STRUCTURE.md)** - Detailed file organization and structure reference.
 
 ## Development Guides
 
 Helper guides for the development process (not needed for production):
 
-- See **[dev-guides/](dev-guides/)** folder for Git, GitHub, and development setup guides
+- **[Development Journal](DEVELOPMENT_JOURNAL.md)** - A personal journal of the experience building the project.
+- See **[dev-guides/](dev-guides/)** folder for Git, GitHub, and development setup guides.
 
 ---
 
@@ -27,4 +28,4 @@ Helper guides for the development process (not needed for production):
 
 ---
 
-**Last Updated:** October 16, 2025
+**Last Updated:** November 10, 2025

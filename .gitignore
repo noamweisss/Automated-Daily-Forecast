@@ -58,7 +58,6 @@ claude sessions/
 
 # Gemini
 .gemini/
-GEMINI.md
 
 # PyCharm
 .idea/

@@ -5,20 +5,35 @@ All notable changes to the IMS Weather Forecast Automation project will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.0] - 2025-11-10
+
+### Added
+- **Daily Random Gradients:** The forecast image background now features a new, randomly selected gradient every day, adding visual variety.
+- **Gradient Test Mode:** A new script `test_gradients.py` was added to generate a set of test images with different gradient backgrounds, allowing for easy visual testing of new color schemes.
+
+### Changed
+- **Separator Lines:** The separator lines between cities in the forecast image are now solid black for improved accessibility and visual consistency, replacing the previous adaptive color logic.
+- **`send_email.py`:** This file, which used the SendGrid API, is no longer the primary email module. The project now uses `send_email_smtp.py`.
+- **`.gitignore`:** Updated to ignore development guides, IDE-specific documentation, and dry-run output images.
+
+### Fixed
+- **Email Module Import:** The import of the email module is now conditional, allowing the project to run in environments where email dependencies are not installed (e.g., for testing image generation only).
+- **Dry-Run Mode:** The dry-run mode has been enhanced to generate test images without requiring email configuration, making it easier to test the image generation pipeline.
+
 ## [4.0.0] - 2025-11-05
 
 ### Phase 4 Complete: Automation & Email Delivery via GitHub Actions ✅
 
-**Major Release:** Successfully implemented automated daily workflow with email delivery using GitHub Actions and SendGrid API. The system now runs completely hands-free in the cloud.
+**Major Release:** Successfully implemented automated daily workflow with email delivery using GitHub Actions and SMTP. The system now runs completely hands-free in the cloud.
 
 ### Added
 
 #### Email Delivery System
-- **New Script: `send_email.py`** (280 lines)
-  - SendGrid API integration for professional email delivery
+- **New Script: `send_email_smtp.py`**
+  - SMTP integration for email delivery
   - HTML email template with Hebrew RTL support
   - Professional design with gradient header and structured layout
-  - Image attachment with base64 encoding
+  - Image attachment
   - Environment variable configuration for security
   - Comprehensive error handling with detailed diagnostics
   - Command-line interface for standalone testing
@@ -38,7 +53,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Subject: "תחזית יומית IMS - {date}" (Hebrew)
   - Attachment: `ims_daily_forecast.jpg`
   - Support for multiple recipients (comma-separated)
-  - Verified sender address requirement (SendGrid)
 
 #### GitHub Actions Automation
 - **New Workflow: `.github/workflows/daily-forecast.yml`**
@@ -56,13 +70,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Environment variable injection from GitHub Secrets
 
 - **GitHub Secrets Configuration**
-  - `SENDGRID_API_KEY`: SendGrid API key for authentication
-  - `EMAIL_SENDER`: From email address (must be verified in SendGrid)
-  - `EMAIL_RECIPIENT`: To email address(es) - supports multiple recipients
+  - `EMAIL_ADDRESS`: Sender email address
+  - `EMAIL_PASSWORD`: Sender email password or app password
+  - `RECIPIENT_EMAIL`: Recipient email address
+  - `SMTP_SERVER`: SMTP server address
+  - `SMTP_PORT`: SMTP port
 
 #### Documentation & Setup Instructions
 - **CLAUDE.md**: Added comprehensive GitHub Actions section
-  - Setup instructions for SendGrid and GitHub Secrets
+  - Setup instructions for SMTP and GitHub Secrets
   - Workflow features and monitoring guide
   - Local testing commands with environment variables
   - Future deployment planning for Phase 5
@@ -78,22 +94,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **forecast_workflow.py**:
   - Updated `CURRENT_PHASE` from 3 to 4
-  - Integrated `send_email.py` import
+  - Integrated `send_email_smtp.py` import
   - Updated `step_send_email()` from placeholder to functional implementation
   - Added forecast_date parameter to email step
   - Enhanced workflow orchestration with email delivery
   - Updated documentation strings to reflect Phase 4 completion
 
 - **requirements.txt**:
-  - Added `sendgrid>=6.11.0` for email delivery
-  - Updated Phase 4 section from placeholder to active dependency
-  - Documented purpose: "Professional email delivery (Phase 4)"
+  - Added `python-dotenv>=1.0.0` for environment variable management.
 
 - **README.md**:
   - Updated current status: "Phase 4 Complete ✅"
   - Added GitHub Actions automation section with setup guide
   - Expanded project structure to include `.github/workflows/`
-  - Updated dependencies list to include SendGrid
+  - Updated dependencies list
   - Changed last updated date to November 5, 2025
   - Updated phase status: "Phase 4 Complete ✅ | Phase 5 Planned 📅"
 
@@ -101,20 +115,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated current status to Phase 4 Complete
   - Added email testing commands to Essential Commands
   - Updated Data Flow section with Email Delivery Phase
-  - Added `send_email.py` to Core Production Scripts
+  - Added `send_email_smtp.py` to Core Production Scripts
   - Updated Phase System section with Phase 4 complete
   - Added comprehensive GitHub Actions Automation section
   - Updated Future Phases to Phase 5: Production Deployment
 
 ### Technical Details
 
-#### SendGrid Integration
-- **API Version**: SendGrid Python SDK 6.11.0+
-- **Authentication**: API key via environment variable
-- **Email Sending**: RESTful API with python library
-- **Attachment Handling**: Base64 encoding for JPEG images
-- **Error Handling**: Specific diagnostics for 401/403/404 errors
-- **Rate Limits**: Free tier supports 100 emails/day (sufficient for daily automation)
+#### SMTP Integration
+- **Authentication**: Email and password/app password via environment variables
+- **Email Sending**: Python's built-in `smtplib`
+- **Attachment Handling**: `MIMEImage` for JPEG images
+- **Error Handling**: Specific diagnostics for SMTP errors
 
 #### GitHub Actions Environment
 - **Runner**: ubuntu-latest
@@ -128,9 +140,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 1. Generate forecast image (output/daily_forecast.jpg)
 2. Load environment variables from GitHub Secrets
 3. Format email with Hebrew/English date displays
-4. Encode image as base64 attachment
-5. Send via SendGrid API with HTML template
-6. Log delivery status and message ID
+4. Attach image
+5. Send via SMTP
+6. Log delivery status
 
 ### Improved
 
@@ -608,7 +620,7 @@ This marks the completion of Phase 1, establishing a solid foundation for automa
 #### Phase 4: Automation & Delivery (Planned)
 - Windows Task Scheduler integration
 - Daily execution at 6:00 AM
-- Email delivery to social media manager
+- Email delivery to social media team (smtplib)
 - Error notification system
 
 #### Phase 5: Server Deployment (Future)
@@ -673,4 +685,4 @@ This marks the completion of Phase 1, establishing a solid foundation for automa
 ---
 
 **Maintained by:** Noam W, IMS Design Team
-**Last Updated:** November 5, 2025
+**Last Updated:** November 10, 2025
