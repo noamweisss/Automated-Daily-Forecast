@@ -12,12 +12,15 @@ This script is designed to run automatically every morning at 6:00 AM.
 
 import sys
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List, Dict
+import random
+import xml.etree.ElementTree as ET
+import glob
 
-from utils import setup_logging, get_today_date, print_separator
+from utils import setup_logging, get_today_date, print_separator, XML_FILE, ARCHIVE_DIR
 from download_forecast import download_and_convert
-from extract_forecast import extract_forecast
+from extract_forecast import extract_forecast, get_available_dates, parse_xml_file
 from generate_forecast_image import generate_all_cities_image
 from send_email_smtp import send_email
 
@@ -32,6 +35,93 @@ from send_email_smtp import send_email
 # Phase 4: Add email delivery
 
 CURRENT_PHASE = 4
+
+
+# ============================================================================
+# GRADIENT TEST HELPERS
+# ============================================================================
+
+def get_random_date_from_xml(logger) -> Optional[str]:
+    """
+    Get a random date from available XML data (main file or archive).
+
+    Args:
+        logger: Logger instance
+
+    Returns:
+        Random date string in YYYY-MM-DD format, or None if no dates available
+    """
+    # Try main XML file first
+    xml_path = Path(__file__).parent / XML_FILE
+
+    if xml_path.exists():
+        logger.info(f"Reading dates from main XML: {xml_path.name}")
+        root = parse_xml_file(xml_path, logger)
+        if root is not None:
+            available_dates = get_available_dates(root, logger)
+            if available_dates:
+                selected_date = random.choice(available_dates)
+                logger.info(f"Randomly selected date: {selected_date}")
+                return selected_date
+
+    # Fallback to archive if main file not available
+    logger.info("Main XML not found, checking archive...")
+    archive_dir = Path(__file__).parent / ARCHIVE_DIR
+
+    if not archive_dir.exists():
+        logger.warning("Archive directory does not exist")
+        return None
+
+    # Get all archive files
+    archive_files = sorted(glob.glob(str(archive_dir / "isr_cities_*.xml")), reverse=True)
+
+    if not archive_files:
+        logger.warning("No archive XML files found")
+        return None
+
+    # Try each archive file until we find dates
+    for archive_path in archive_files:
+        logger.info(f"Reading dates from archive: {Path(archive_path).name}")
+        root = parse_xml_file(Path(archive_path), logger)
+        if root is not None:
+            available_dates = get_available_dates(root, logger)
+            if available_dates:
+                selected_date = random.choice(available_dates)
+                logger.info(f"Randomly selected date: {selected_date}")
+                return selected_date
+
+    logger.warning("No dates found in any XML files")
+    return None
+
+
+def resolve_gradient_test_date(gradient_test: str, logger) -> Optional[str]:
+    """
+    Resolve gradient test mode to a specific date.
+
+    Args:
+        gradient_test: One of 'today', 'tomorrow', or 'random'
+        logger: Logger instance
+
+    Returns:
+        Resolved date string in YYYY-MM-DD format
+    """
+    if gradient_test == 'today':
+        date = datetime.now().strftime('%Y-%m-%d')
+        logger.info(f"Gradient test mode 'today': {date}")
+        return date
+
+    elif gradient_test == 'tomorrow':
+        date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+        logger.info(f"Gradient test mode 'tomorrow': {date}")
+        return date
+
+    elif gradient_test == 'random':
+        logger.info("Gradient test mode 'random': selecting random date from available data...")
+        return get_random_date_from_xml(logger)
+
+    else:
+        logger.error(f"Invalid gradient test mode: {gradient_test}")
+        return None
 
 
 # ============================================================================
@@ -188,13 +278,14 @@ def step_send_email(image_path: str, forecast_date: str, logger, dry_run: bool =
 # MAIN WORKFLOW
 # ============================================================================
 
-def run_workflow(dry_run: bool = False, target_date: Optional[str] = None) -> bool:
+def run_workflow(dry_run: bool = False, target_date: Optional[str] = None, gradient_test: Optional[str] = None) -> bool:
     """
     Execute the complete daily forecast workflow.
 
     Args:
         dry_run: If True, simulate without making changes
         target_date: Target date for extraction (default: today)
+        gradient_test: Gradient test mode ('today', 'tomorrow', or 'random') - overrides target_date
 
     Returns:
         True if successful, False if any step failed
@@ -210,6 +301,15 @@ def run_workflow(dry_run: bool = False, target_date: Optional[str] = None) -> bo
 
     start_time = datetime.now()
     logger.info(f"Workflow started: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+
+    # Handle gradient test mode (overrides target_date)
+    if gradient_test:
+        logger.info(f"GRADIENT TEST MODE: {gradient_test}")
+        resolved_date = resolve_gradient_test_date(gradient_test, logger)
+        if resolved_date is None:
+            logger.error("Failed to resolve gradient test date")
+            return False
+        target_date = resolved_date
 
     if target_date is None:
         target_date = get_today_date()
@@ -321,6 +421,15 @@ Examples:
   # Extract specific date
   python forecast_workflow.py --date 2025-09-28
 
+  # Test gradients with today's date
+  python forecast_workflow.py --gradient-test today
+
+  # Test gradients with tomorrow's date
+  python forecast_workflow.py --gradient-test tomorrow
+
+  # Test gradients with random date from available data
+  python forecast_workflow.py --gradient-test random
+
   # Verbose output
   python forecast_workflow.py --verbose
 
@@ -340,6 +449,12 @@ every morning at 6:00 AM.
         help='Target date in YYYY-MM-DD format (default: today)'
     )
     parser.add_argument(
+        '--gradient-test',
+        type=str,
+        choices=['today', 'tomorrow', 'random'],
+        help='Gradient test mode: "today", "tomorrow", or "random" (picks random date from available data). Overrides --date.'
+    )
+    parser.add_argument(
         '--verbose',
         action='store_true',
         help='Enable verbose logging'
@@ -354,7 +469,8 @@ every morning at 6:00 AM.
     # Run workflow
     success = run_workflow(
         dry_run=args.dry_run,
-        target_date=args.date
+        target_date=args.date,
+        gradient_test=args.gradient_test
     )
 
     # Exit with appropriate code
