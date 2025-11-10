@@ -179,9 +179,46 @@ def extract_city_forecast(location: ET.Element, target_date: str, logger) -> Opt
         return None
 
 
+def get_available_dates(root: ET.Element, logger) -> List[str]:
+    """
+    Get all available forecast dates from the XML.
+
+    Args:
+        root: XML root element
+        logger: Logger instance
+
+    Returns:
+        List of dates in YYYY-MM-DD format, sorted chronologically
+    """
+    dates = set()
+
+    try:
+        # Find all Date elements across all locations
+        for date_elem in root.findall('.//TimeUnitData/Date'):
+            if date_elem.text:
+                dates.add(date_elem.text)
+
+        # Sort dates chronologically
+        sorted_dates = sorted(list(dates))
+
+        if sorted_dates:
+            logger.info(f"Available forecast dates in XML: {', '.join(sorted_dates)}")
+        else:
+            logger.warning("No forecast dates found in XML")
+
+        return sorted_dates
+
+    except Exception as e:
+        logger.error(f"Error getting available dates: {e}")
+        return []
+
+
 def extract_all_cities(root: ET.Element, target_date: str, logger) -> List[Dict]:
     """
     Extract forecast data for all cities in the XML.
+
+    If no data found for target_date, automatically falls back to the first
+    available date in the XML (handles case where XML has tomorrow's forecast).
 
     Args:
         root: XML root element
@@ -208,6 +245,42 @@ def extract_all_cities(root: ET.Element, target_date: str, logger) -> List[Dict]
                 logger.warning(f"Skipping city with invalid data: {city_data.get('name_eng', 'Unknown')}")
 
     logger.info(f"Successfully extracted {len(cities_data)} cities")
+
+    # Smart date detection: If no cities found, try subsequent available dates
+    if len(cities_data) == 0:
+        logger.warning(f"No data found for target date: {target_date}")
+        logger.info("Attempting smart date detection...")
+
+        available_dates = get_available_dates(root, logger)
+
+        if available_dates:
+            # Try each available date until we find one with data
+            for fallback_date in available_dates:
+                # Skip the target date if we already tried it
+                if fallback_date == target_date:
+                    continue
+
+                logger.info(f"Trying fallback date: {fallback_date}")
+
+                # Re-extract with fallback date
+                for location in locations:
+                    city_data = extract_city_forecast(location, fallback_date, logger)
+                    if city_data is not None:
+                        if validate_city_data(city_data, logger):
+                            cities_data.append(city_data)
+
+                # If we got cities, we're done
+                if len(cities_data) > 0:
+                    logger.info(f"✓ Successfully extracted {len(cities_data)} cities using date: {fallback_date}")
+                    logger.info(f"Note: IMS published new forecast - using {fallback_date} instead of {target_date}")
+                    break
+                else:
+                    logger.warning(f"No valid data found for {fallback_date}, trying next date...")
+
+            if len(cities_data) == 0:
+                logger.error("No valid data found in any available date")
+        else:
+            logger.error("No available dates found in XML")
 
     return cities_data
 
@@ -333,9 +406,10 @@ def extract_forecast(target_date: Optional[str] = None,
     print_separator(logger)
     logger.info("EXTRACTION COMPLETE")
     print_separator(logger)
-    logger.info(f"Date: {target_date}")
+    logger.info(f"Target date: {target_date}")
     logger.info(f"Cities extracted: {len(cities_data)}")
     logger.info(f"Sorted: North to South")
+    logger.info("Note: If smart date detection was used, actual date may differ from target")
 
     # Display brief city list
     logger.info("\nExtracted cities:")

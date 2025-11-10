@@ -133,6 +133,10 @@ pip install -r requirements.txt
 - North-to-south sorting by latitude
 - Archive fallback if main XML missing
 - Validates expected city count (15)
+- **Smart date detection:** Automatically falls back to next available date if target date has no data
+  * Handles IMS publishing tomorrow's forecast after 16:00 daily
+  * Tries each available date until valid data found
+  * Logs clearly which date was used (target vs actual)
 
 **utils.py** - Shared utilities
 - Logging setup (console + file at `logs/forecast_automation.log`)
@@ -254,6 +258,10 @@ sorted_cities = sorted(cities_data, key=lambda city: city['latitude'], reverse=T
 
 **Extraction failures:**
 - Archive fallback if main XML unavailable
+- **Smart date detection:** If target date has no data, automatically tries next available date
+  * Handles case when IMS publishes tomorrow's forecast after 16:00
+  * Iterates through all available dates until valid data found
+  * Common after 4 PM Israel time when new forecast is published
 - Validates city count and warns if ≠ 15
 - Validates required fields per city
 - Returns None if no cities extracted
