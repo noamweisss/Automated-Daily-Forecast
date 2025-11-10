@@ -62,7 +62,37 @@ SEPARATOR_COLOR = (255, 255, 255, 50)  # Semi-transparent white line
 COLOR_WHITE = (255, 255, 255)
 COLOR_BLACK = (0, 0, 0)
 COLOR_GRAY = (100, 100, 100)
-COLOR_SKY_LIGHT = (135, 206, 250)  # Light sky blue for gradient top
+COLOR_SKY_LIGHT = (135, 206, 250)  # Light sky blue for gradient top (legacy)
+
+# Gradient Presets (Daily Random Selection)
+# Each gradient is a tuple of RGB colors: (top_color, bottom_color)
+# Gradients are selected deterministically based on forecast date
+GRADIENT_PRESETS = [
+    # Classic sky blue (original)
+    ((135, 206, 250), (255, 255, 255)),  # Sky blue → White
+
+    # Warm gradients
+    ((255, 183, 197), (255, 255, 255)),  # Soft pink → White
+    ((255, 200, 170), (255, 255, 255)),  # Peach → White
+    ((255, 218, 185), (255, 255, 255)),  # Light coral → White
+    ((255, 160, 122), (255, 255, 255)),  # Salmon → White
+
+    # Cool gradients
+    ((176, 224, 230), (255, 255, 255)),  # Powder blue → White
+    ((173, 216, 230), (255, 255, 255)),  # Light blue → White
+    ((152, 251, 152), (255, 255, 255)),  # Pale green → White
+    ((175, 238, 238), (255, 255, 255)),  # Pale turquoise → White
+
+    # Purple/violet gradients
+    ((221, 160, 221), (255, 255, 255)),  # Plum → White
+    ((216, 191, 216), (255, 255, 255)),  # Thistle → White
+    ((230, 230, 250), (255, 255, 255)),  # Lavender → White
+
+    # Golden/yellow gradients (light for readability)
+    ((255, 239, 213), (255, 255, 255)),  # Papaya whip → White
+    ((255, 250, 205), (255, 255, 255)),  # Lemon chiffon → White
+    ((240, 230, 140), (255, 255, 255)),  # Khaki → White
+]
 
 # Paths
 BASE_DIR = Path(__file__).parent
@@ -241,11 +271,39 @@ def format_forecast_date(date_str: str) -> str:
         return date_str
 
 
+def select_daily_gradient(date_str: str) -> tuple:
+    """
+    Select a gradient deterministically based on the forecast date.
+
+    The same date always returns the same gradient, ensuring consistency
+    across multiple runs while providing variety across different dates.
+
+    Args:
+        date_str: Date string in YYYY-MM-DD format
+
+    Returns:
+        Tuple of (top_color, bottom_color) where each color is an RGB tuple
+    """
+    import hashlib
+
+    # Use MD5 hash of date string to get deterministic but well-distributed index
+    hash_value = hashlib.md5(date_str.encode()).hexdigest()
+    gradient_index = int(hash_value, 16) % len(GRADIENT_PRESETS)
+
+    gradient = GRADIENT_PRESETS[gradient_index]
+    print(f"  Selected gradient #{gradient_index + 1}/{len(GRADIENT_PRESETS)} for date {date_str}")
+    print(f"    Top color: RGB{gradient[0]}")
+    print(f"    Bottom color: RGB{gradient[1]}")
+
+    return gradient
+
+
 # ============================================================================
 # IMAGE GENERATION FUNCTIONS
 # ============================================================================
 
-def create_gradient_background(width: int, height: int, header_height: int) -> Image.Image:
+def create_gradient_background(width: int, height: int, header_height: int,
+                               gradient_colors: tuple) -> Image.Image:
     """
     Create image with white header and gradient background.
 
@@ -253,6 +311,7 @@ def create_gradient_background(width: int, height: int, header_height: int) -> I
         width: Image width in pixels
         height: Image height in pixels
         header_height: Height of white header section
+        gradient_colors: Tuple of (top_color, bottom_color) where each is RGB tuple
 
     Returns:
         PIL Image with header and gradient background
@@ -264,13 +323,16 @@ def create_gradient_background(width: int, height: int, header_height: int) -> I
     # Draw white header
     draw.rectangle([(0, 0), (width, header_height)], fill=COLOR_WHITE)
 
-    # Draw vertical gradient below header (sky blue to white)
+    # Unpack gradient colors
+    color_top, color_bottom = gradient_colors
+
+    # Draw vertical gradient below header (top color to bottom color)
     for y in range(header_height, height):
         # Calculate color interpolation (0.0 at header_height, 1.0 at bottom)
         ratio = (y - header_height) / (height - header_height)
-        r = int(COLOR_SKY_LIGHT[0] + (COLOR_WHITE[0] - COLOR_SKY_LIGHT[0]) * ratio)
-        g = int(COLOR_SKY_LIGHT[1] + (COLOR_WHITE[1] - COLOR_SKY_LIGHT[1]) * ratio)
-        b = int(COLOR_SKY_LIGHT[2] + (COLOR_WHITE[2] - COLOR_SKY_LIGHT[2]) * ratio)
+        r = int(color_top[0] + (color_bottom[0] - color_top[0]) * ratio)
+        g = int(color_top[1] + (color_bottom[1] - color_top[1]) * ratio)
+        b = int(color_top[2] + (color_bottom[2] - color_top[2]) * ratio)
 
         draw.line([(0, y), (width, y)], fill=(r, g, b))
 
@@ -399,9 +461,13 @@ def generate_all_cities_image(cities_data: list, forecast_date: str, output_path
     try:
         print(f"\nGenerating forecast image for {len(cities_data)} cities")
 
+        # Select daily gradient based on forecast date
+        print("  Selecting daily gradient...")
+        gradient_colors = select_daily_gradient(forecast_date)
+
         # Create canvas with white header and gradient background
         print("  Creating canvas with header and gradient background...")
-        image = create_gradient_background(IMAGE_WIDTH, IMAGE_HEIGHT, HEADER_HEIGHT)
+        image = create_gradient_background(IMAGE_WIDTH, IMAGE_HEIGHT, HEADER_HEIGHT, gradient_colors)
 
         # Add header content (logo and date)
         print("  Adding header with logo and date...")
