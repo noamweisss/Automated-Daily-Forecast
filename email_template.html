@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            direction: rtl;
+            text-align: right;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px 20px;
+            color: #333333;
+            line-height: 1.6;
+        }
+        .content p {
+            margin: 10px 0;
+        }
+        .image-container {
+            text-align: center;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .footer {
+            background-color: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666666;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>תחזית מזג האוויר היומית</h1>
+            <p style="margin: 5px 0 0 0; font-size: 16px;">Daily Weather Forecast</p>
+        </div>
+
+        <div class="content">
+            <p>בוקר טוב מצוות ניו מדיה,</p>
+
+            <p>מצורפת תחזית מזג האוויר ליום <strong>{forecast_date}</strong> עבור 15 הערים המרכזיות בישראל.</p>
+
+            <p>התחזית כוללת:</p>
+            <ul>
+                <li>טמפרטורות מקסימום ומינימום</li>
+                <li>תיאור מזג האוויר (אייקונים)</li>
+                <li>ערים ממוינות מצפון לדרום</li>
+            </ul>
+
+            <p>התמונה מוכנה לפרסום ב-Instagram Stories (1080x1920 פיקסלים).</p>
+        </div>
+
+        <div class="image-container">
+            <p style="margin-bottom: 10px; color: #666;"><strong>תחזית יומית - Daily Forecast</strong></p>
+            <p style="font-size: 12px; color: #999; margin-top: 5px;">
+                התמונה מצורפת לאימייל / Image attached to email
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>מערכת אוטומטית לתחזית מזג אוויר - השירות המטאורולוגי הישראלי</p>
+            <p>IMS Weather Forecast Automation System</p>
+            <p>התמונה נוצרה באופן אוטומטי באמצעות סקריפט פייתון.</p>
+            <p style="margin-top: 10px;">
+                <a href="https://ims.gov.il">ims.gov.il</a>
+            </p>
+            <a href="https://github.com/noamweisss/Automated-Daily-Forecast" style="text-decoration: none; display: inline-block; margin-top: 10px;">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iY3VycmVudENvbG9yIiBjbGFzcz0iYmkgYmktZ2l0aHViIiB2aWV3Qm94PSIwIDAgMTYgMTYiPgogIDxwYXRoIGQ9Ik04IDBDMy41OCAwIDAgMy41OCAwIDhjMCAzLjU0IDIuMjkgNi41MyA1LjQ3IDcuNTkuNC4wNy41NS0uMTcuNTUtLjM4IDAtLjE5LS4wMS0uODItLjAxLTEuNDktMi4wMS4zNy0yLjUzLS40OS0yLjY5LS45NC0uMDktLjIzLS40OC0uOTQtLjgyLTEuMTMtLjI4LS4xNS0uNjgtLjUyLS4wMS0uNTMuNjMtLjAxIDEuMDguNTggMS4yMy44Mi43MiAxLjIxIDEuODcuODcgMi4zMy42Ni4wNy0uNTIuMjgtLjg3LjUxLTEuMDctMS43OC0uMi0zLjY0LS44OS0zLjY0LTMuOTUgMC0uODcuMzEtMS41OS44Mi0yLjE1LS4wOC0uMi0uMzYtMS4wMi4wOC0yLjEyIDAgMCAuNjctLjIxIDIuMi44Mi42NC0uMTggMS4zMi0uMjcgMi0uMjcuNjggMCAxLjM2LjA5IDIgLjI3IDEuNTMtMS4wNCAyLjItLjgyIDIyLS44MmMuNDQgMS4xLjE2IDEuOTIuMDggMi4xMi41MS41Ni44MiAxLjI3LjgyIDIuMTUgMCAzLjA3LTEuODcgMy43NS0zLjY1IDMuOTUuMjkuMjUuNTQuNzMuNTQgMS40OCAwIDEuMDctLjAxIDEuOTMtLjAxIDIuMiAwIC4yMS4xNS40Ni41NS4zOEE4LjAxIDEuMDEgMCAwIDAgMTYgOGMwLTQuNDItMy41OC04LTgtOHoiLz4KPC9zdmc+" alt="GitHub" style="width: 24px; height: 24px; vertical-align: middle;">
+            </a>
+        </div>
+    </div>
+</body>
+</html>
