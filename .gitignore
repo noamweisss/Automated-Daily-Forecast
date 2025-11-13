@@ -95,6 +95,10 @@ temp/
 tmp/
 test_output/
 
+# Development tools (email template preview utility)
+preview_email_template.py
+preview_output.html
+
 # ============================================================================
 # Temporary Files
 # ============================================================================
@@ -102,4 +106,7 @@ test_output/
 # Internal Dev Documents
 docs/dev-guides/
 CodesForIMSWebSite_1.pdf
+
+# Pip install artifacts
+=*
 
