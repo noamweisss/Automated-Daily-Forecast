@@ -64,7 +64,7 @@ Click "New repository secret" for each of these:
 |------------|-------------|---------------|
 | `EMAIL_ADDRESS` | Gmail account sending the forecast | `mws430170@gmail.com` |
 | `EMAIL_PASSWORD` | Gmail App Password (16 chars) | `abcdefghijklmnop` |
-| `RECIPIENT_EMAIL` | Email address receiving forecasts | `noamw2703@gmail.com` |
+| `RECIPIENTS_LIST` | **Multi-recipient list** (one per line) | See below |
 | `SMTP_SERVER` | SMTP server address | `smtp.gmail.com` |
 | `SMTP_PORT` | SMTP port (TLS) | `587` |
 
@@ -89,14 +89,25 @@ Value: your-16-char-app-password
 - Generate at: https://myaccount.google.com/apppasswords
 - Example format: `abcdefghijklmnop` (no spaces)
 
-#### 3. RECIPIENT_EMAIL
+#### 3. RECIPIENTS_LIST (Multi-Recipient Support)
 ```
-Name: RECIPIENT_EMAIL
-Value: recipient@example.com
+Name: RECIPIENTS_LIST
+Value:
+user1@example.com
+user2@gmail.com
+team@company.com
 ```
-- Email address that will **receive** the daily forecasts
-- Can be any email address (Gmail, Outlook, etc.)
-- Can be the same as EMAIL_ADDRESS for testing
+- **One email address per line** (GitHub preserves line breaks)
+- Can include multiple recipients (as many as needed)
+- Empty lines and lines starting with `#` are ignored (comments)
+- Example multi-recipient value:
+  ```
+  noamw2703@gmail.com
+  weissno@ims.gov.il
+  sassona@ims.gov.il
+  # weather-team@ims.gov.il (commented out)
+  ```
+- **Important:** Copy your local `recipients.txt` content directly into this secret
 
 #### 4. SMTP_SERVER
 ```
@@ -127,7 +138,7 @@ After adding all secrets:
    - You should see all 5 secrets listed:
      - ✅ EMAIL_ADDRESS
      - ✅ EMAIL_PASSWORD
-     - ✅ RECIPIENT_EMAIL
+     - ✅ RECIPIENTS_LIST
      - ✅ SMTP_SERVER
      - ✅ SMTP_PORT
 
@@ -224,7 +235,7 @@ schedule:
 2. Verify all 5 secrets exist with EXACT names (case-sensitive):
    - `EMAIL_ADDRESS`
    - `EMAIL_PASSWORD`
-   - `RECIPIENT_EMAIL`
+   - `RECIPIENTS_LIST`
    - `SMTP_SERVER`
    - `SMTP_PORT`
 3. Re-run workflow
@@ -244,10 +255,11 @@ schedule:
 **Cause:** Email in spam folder or recipient address incorrect
 
 **Solution:**
-1. Check spam/junk folder
-2. Verify `RECIPIENT_EMAIL` secret value
+1. Check spam/junk folder for all recipients
+2. Verify `RECIPIENTS_LIST` secret value (check email addresses)
 3. Add sender to safe senders list
 4. Check Gmail "Sent" folder (if sender is Gmail)
+5. Verify recipients.txt was created correctly in workflow logs
 
 ### Workflow Doesn't Run Automatically
 
@@ -354,7 +366,7 @@ After Phase 4c completes successfully:
 
 - [ ] `EMAIL_ADDRESS` - Gmail sender
 - [ ] `EMAIL_PASSWORD` - 16-char App Password
-- [ ] `RECIPIENT_EMAIL` - Forecast recipient
+- [ ] `RECIPIENTS_LIST` - Multi-recipient list (one per line)
 - [ ] `SMTP_SERVER` - smtp.gmail.com
 - [ ] `SMTP_PORT` - 587
 

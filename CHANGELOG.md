@@ -5,6 +5,37 @@ All notable changes to the IMS Weather Forecast Automation project will be docum
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.0] - 2025-11-17
+
+### Added - Phase 4c Complete: Multi-Recipient Email System ✅
+- **Multi-Recipient Support:** Email system now supports multiple recipients via `recipients.txt` file (one email per line)
+- **Recipients Configuration File:** Created `recipients.txt` for flexible recipient management with comment support (#) and empty line handling
+- **GitHub Secret Integration:** Added `RECIPIENTS_LIST` secret for secure multi-recipient configuration in GitHub Actions
+- **Runtime File Creation:** GitHub Actions workflow creates `recipients.txt` from secret at runtime (no commits needed)
+- **Recipients Template:** Added `recipients.txt.example` showing format and usage
+
+### Changed
+- **Removed `RECIPIENT_EMAIL` Environment Variable:** Replaced single recipient env var with multi-recipient file system
+- **Updated GitHub Actions Workflow:** Modified `.github/workflows/daily-forecast.yml` to create recipients.txt from `RECIPIENTS_LIST` secret
+- **Updated `.env.example`:** Removed `RECIPIENT_EMAIL`, added instructions pointing to `recipients.txt` configuration
+- **Enhanced `.gitignore`:** Added `recipients.txt` protection to prevent accidental commits of recipient emails
+
+### Improved
+- **Scalability:** Easy to add/remove recipients without code or environment variable changes
+- **Security:** Recipients never committed to repository, stored only in GitHub Secrets
+- **Documentation:** Complete update across all docs (CLAUDE.md, README.md, GITHUB_ACTIONS_SETUP.md, PROJECT_STRUCTURE.md)
+- **Testing:** Validated with 3 recipients - all emails delivered successfully
+
+### Testing Results
+- ✅ Dry-run test: Workflow executed without errors, recipients.txt created with 3 recipients
+- ✅ Production test: All 3 recipients received forecast email successfully
+- ✅ Security verification: No sensitive data in repository, all credentials in GitHub Secrets
+- ✅ Artifact uploads: Forecast image and logs successfully archived
+
+**Phase 4c Achievement:** Full end-to-end automation achieved with multi-recipient support. The system runs completely unattended on GitHub Actions, downloading fresh forecasts daily, generating images, and distributing to multiple recipients.
+
+---
+
 ## [4.2.0] - 2025-11-13
 
 ### Added

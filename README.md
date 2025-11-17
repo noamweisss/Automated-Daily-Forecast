@@ -46,13 +46,14 @@ This project automates the creation of daily weather forecast images for the Isr
 
 ### Phase 4: Automation & Email Delivery ✅ COMPLETE
 - ✅ SMTP integration for professional email delivery
+- ✅ **Multi-recipient support** via `recipients.txt` file (one email per line)
 - ✅ Automated daily execution via GitHub Actions (6:00 AM Israel time)
 - ✅ External HTML email template with IMS branding
 - ✅ Professional design: Orange-to-blue gradient, Noto Sans Hebrew font
 - ✅ Easy template customization without code changes
 - ✅ Manual trigger support for testing
 - ✅ Artifact storage (images & logs) for 90 days
-- ✅ Environment variable configuration for secure credentials
+- ✅ GitHub Secrets for secure credentials (no commits needed)
 - ✅ Dry-run mode for safe testing
 
 ### Recent Enhancements
