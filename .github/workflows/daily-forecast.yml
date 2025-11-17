@@ -83,7 +83,16 @@ jobs:
           ls -la
 
       # ======================================================================
-      # STEP 5: RUN WORKFLOW
+      # STEP 5: CREATE RECIPIENTS FILE
+      # ======================================================================
+
+      - name: 📧 Create recipients.txt from Secret
+        run: |
+          echo "${{ secrets.RECIPIENTS_LIST }}" > recipients.txt
+          echo "✓ Created recipients.txt with $(wc -l < recipients.txt | tr -d ' ') recipients"
+
+      # ======================================================================
+      # STEP 6: RUN WORKFLOW
       # ======================================================================
 
       - name: 🚀 Run Forecast Workflow
@@ -91,7 +100,6 @@ jobs:
           # SMTP credentials from GitHub Secrets (Phase 4c - SMTP)
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
           SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
         run: |
@@ -105,7 +113,7 @@ jobs:
           fi
 
       # ======================================================================
-      # STEP 6: UPLOAD ARTIFACTS
+      # STEP 7: UPLOAD ARTIFACTS
       # ======================================================================
 
       - name: 📤 Upload Generated Image
@@ -125,7 +133,7 @@ jobs:
           retention-days: 30  # Keep logs for 30 days
 
       # ======================================================================
-      # STEP 7: SUMMARY
+      # STEP 8: SUMMARY
       # ======================================================================
 
       - name: 📊 Workflow Summary

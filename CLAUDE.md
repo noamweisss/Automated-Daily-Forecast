@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 IMS Weather Forecast Automation - Automated daily weather forecast generator for Israeli cities. Downloads forecast data from Israel Meteorological Service (IMS), processes it, and generates Instagram-ready story images featuring 15 major Israeli cities.
 
-**Current Status:** Phase 4b Complete (Workflow Integration) | Phase 4c Planned (GitHub Actions Automation)
+**Current Status:** Phase 4b Complete (Workflow Integration) | Phase 4c Ready for Testing (GitHub Actions Automation)
 
 ## Essential Commands
 
@@ -364,7 +364,7 @@ The project follows an incremental phase system:
 - **Phase 3.5:** Weather icon system with full IMS code coverage (COMPLETE)
 - **Phase 4a:** Basic SMTP email delivery (COMPLETE)
 - **Phase 4b:** Workflow integration (COMPLETE)
-- **Phase 4c:** GitHub Actions automation (PLANNED)
+- **Phase 4c:** GitHub Actions automation (READY FOR TESTING - workflow configured, awaiting secrets setup)
 - **Phase 5:** Production server deployment (FUTURE)
 
 **CURRENT_PHASE** constant in forecast_workflow.py controls which steps execute (currently set to 4 - all phases active).
@@ -729,14 +729,72 @@ python forecast_workflow.py
 **Phase 4b Achievement:**
 The IMS Weather Forecast Automation now runs end-to-end as a single command, with all phases coordinated through the main workflow script. Email delivery is no longer a separate manual step.
 
-### Phase 4c: GitHub Actions Automation (PLANNED 📋)
+### Phase 4c: GitHub Actions Automation (READY FOR TESTING 🔧)
 
-**After Phase 4b completes:**
-- Add GitHub Secrets for email credentials
-- Create GitHub Actions workflow
-- Daily scheduled run (6:00 AM Israel time)
-- Manual trigger for testing
-- Only after local workflow 100% reliable
+**Status:** Workflow configured, ready for GitHub Secrets setup
+
+**What We Built:**
+- GitHub Actions workflow in `.github/workflows/daily-forecast.yml`
+- Daily scheduled run (3:00 AM UTC = 6:00 AM Israel time)
+- Manual trigger with dry-run option for testing
+- Runtime creation of `recipients.txt` from GitHub Secret (secure)
+- Artifact uploads (forecast image + logs)
+- No sensitive data in repository
+
+**Required GitHub Secrets:**
+
+Navigate to: **Repository Settings → Secrets and variables → Actions → New repository secret**
+
+Add these 5 secrets:
+
+1. **EMAIL_ADDRESS**
+   - Your Gmail sender address
+   - Example: `forecasts@gmail.com`
+
+2. **EMAIL_PASSWORD**
+   - Gmail App Password (16 characters, no spaces)
+   - Generate at: https://myaccount.google.com/apppasswords
+
+3. **SMTP_SERVER**
+   - Value: `smtp.gmail.com`
+
+4. **SMTP_PORT**
+   - Value: `587`
+
+5. **RECIPIENTS_LIST** ⭐ (Multi-recipient support)
+   - One email per line (GitHub preserves line breaks)
+   - Example value:
+     ```
+     user1@example.com
+     user2@gmail.com
+     team@company.com
+     ```
+   - ⚠️ **Important:** Copy your local `recipients.txt` content directly into this secret
+
+**How It Works:**
+
+1. Workflow runs on schedule or manual trigger
+2. Python environment set up with dependencies
+3. **Recipients file created from secret:**
+   ```bash
+   echo "${{ secrets.RECIPIENTS_LIST }}" > recipients.txt
+   ```
+4. Environment variables set from secrets (EMAIL_ADDRESS, etc.)
+5. `forecast_workflow.py` executes (download → extract → generate → email)
+6. Artifacts uploaded (image, logs)
+7. Sensitive files cleaned up automatically
+
+**Testing Steps:**
+
+1. **Set up secrets** (follow instructions above)
+2. **Manual test run:**
+   - Go to: Actions → IMS Daily Weather Forecast → Run workflow
+   - Select branch: `main`
+   - Dry run: `true` (test without sending email)
+   - Click "Run workflow"
+3. **Check logs:** Verify recipients.txt created with correct count
+4. **Production run:** Set Dry run: `false` and check all recipients receive email
+5. **Scheduled run:** Wait for 3:00 AM UTC (6:00 AM Israel) or adjust cron if needed
 
 ### Key Lessons Learned (Phase 4a Session - Nov 6, 2025)
 
